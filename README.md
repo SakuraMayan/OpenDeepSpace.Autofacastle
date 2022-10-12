@@ -1,1 +1,1 @@
-OpenDeepSpace.Autofacastle
+OpenDeepSpace.Autofacastle 一个基于特性完成Autofac容器中批量注入服务实例；并且基于特性的方式结合Autofac以及Castle实现AOP切面或叫横切关注点的实现以及轻松的使用，并且轻松兼容你现有工程项目。
