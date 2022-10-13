@@ -90,5 +90,22 @@ namespace OpenDeepSpace.Autofacastle.Extensions
             return type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                     .Where(m => !m.IsSpecialName).SelectMany(t => t.GetCustomAttributes());
         }
+
+        /// <summary>
+        /// 修复类型 获取到的泛型接口FullName为null
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static Type FixTypeReference(this Type type)
+        {
+            if (type.FullName != null)
+                return type;
+
+            string typeQualifiedName = type.DeclaringType != null
+                ? type.DeclaringType.FullName + "+" + type.Name + "," + type.Assembly.FullName
+                : type.Namespace + "." + type.Name + "," + type.Assembly.FullName;
+
+            return Type.GetType(typeQualifiedName, true);
+        }
     }
 }

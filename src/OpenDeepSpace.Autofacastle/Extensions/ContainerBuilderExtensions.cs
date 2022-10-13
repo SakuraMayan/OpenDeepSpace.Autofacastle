@@ -380,6 +380,12 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         /// <param name="service"></param>
         private static IRegistrationBuilder<object, ReflectionActivatorData, DynamicRegistrationStyle> AsServiceForGenericType(Type type, DependencyInjectionAttribute dependencyInjectionAttr, IRegistrationBuilder<object, ReflectionActivatorData, DynamicRegistrationStyle> registrationBuilder, Type service)
         {
+
+            //如果直接获取的出来Ixxx<> FullName为空 
+            //针对泛型 FullName为空导致为非泛型 补充完整FullName 才能正确批量注入动态泛型
+            //例如(typeof(Ixxx<>),typeof(xxx()))
+            service = service.FixTypeReference();
+
             //作为服务
             registrationBuilder.As(service);
 
