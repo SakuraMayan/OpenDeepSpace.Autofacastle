@@ -18,7 +18,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
     /// </summary>
     public static class ContainerBuilderExtensions
     {
-        internal static bool IsConfigureIntercept=false;
+        internal static bool IsConfigureIntercept = false;
 
         /// <summary>
         /// 批量注入
@@ -32,9 +32,9 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                 throw new ArgumentNullException(nameof(assemblies));
 
 
-            var types = assemblies.SelectMany(t=>t.GetTypes());
+            var types = assemblies.SelectMany(t => t.GetTypes());
 
-            BatchInjectionInternal(containerBuilder, types,IsConfigureIntercept);
+            BatchInjectionInternal(containerBuilder, types, IsConfigureIntercept);
 
             return containerBuilder;
         }
@@ -51,12 +51,12 @@ namespace OpenDeepSpace.Autofacastle.Extensions
             if (types == null)
                 throw new ArgumentNullException(nameof(types));
 
-            BatchInjectionInternal(containerBuilder, types,IsConfigureIntercept);
+            BatchInjectionInternal(containerBuilder, types, IsConfigureIntercept);
 
             return containerBuilder;
         }
 
-     
+
         /// <summary>
         /// ContainerBuilder批量注入
         /// </summary>
@@ -64,12 +64,12 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         /// <returns></returns>
         public static ContainerBuilder BatchInjection(this ContainerBuilder containerBuilder)
         {
-            
+
 
             //获取类型
             var types = TypeFinder.GetAllTypes();
-            
-            BatchInjectionInternal(containerBuilder, types,IsConfigureIntercept);
+
+            BatchInjectionInternal(containerBuilder, types, IsConfigureIntercept);
 
             return containerBuilder;
         }
@@ -96,10 +96,9 @@ namespace OpenDeepSpace.Autofacastle.Extensions
             return containerBuilder;
         }
 
-        private static void BatchInjectionInternal(ContainerBuilder containerBuilder, IEnumerable<Type> types,bool IsConfigureIntercept=false)
+        private static void BatchInjectionInternal(ContainerBuilder containerBuilder, IEnumerable<Type> types, bool IsConfigureIntercept = false)
         {
-            types=types.Where(t => t.IsClass && !t.IsAbstract);
-
+            types = types.Where(t => t.IsClass && !t.IsAbstract);
             foreach (var type in types)
             {
                 //瞬时
@@ -127,10 +126,10 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                                     registrationBuilder = AsServiceForGenericType(type, transientAttr, registrationBuilder, service);
                                     //设置生命周期
                                     registrationBuilder.InstancePerDependency();
-                                    //配置拦截
-                                    if(IsConfigureIntercept)
-                                        registrationBuilder.AddIntercept(type);
+
+
                                 }
+
                             }
                             else
                             {//未指定服务注入 查找实现的相关接口注入 
@@ -139,11 +138,13 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                                     registrationBuilder = AsServiceForGenericType(type, transientAttr, registrationBuilder, service);
                                     //设置生命周期
                                     registrationBuilder.InstancePerDependency();
-                                    //配置拦截
-                                    if (IsConfigureIntercept)
-                                        registrationBuilder.AddIntercept(type);
+
+
                                 }
                             }
+                            //配置拦截
+                            if (IsConfigureIntercept)
+                                registrationBuilder.AddIntercept(type, false);
                         }
 
 
@@ -161,10 +162,9 @@ namespace OpenDeepSpace.Autofacastle.Extensions
 
                                 //设置生命周期
                                 registrationBuilder.InstancePerDependency();
-                                //配置拦截
-                                if (IsConfigureIntercept)
-                                    registrationBuilder.AddIntercept(type);
+
                             }
+
                         }
                         else
                         {//未指定服务注入 查找实现的相关接口注入 
@@ -173,11 +173,12 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                                 registrationBuilder = AsService(type, transientAttr, registrationBuilder, service);
                                 //设置生命周期
                                 registrationBuilder.InstancePerDependency();
-                                //配置拦截
-                                if (IsConfigureIntercept)
-                                    registrationBuilder.AddIntercept(type);
+
                             }
                         }
+                        //配置拦截
+                        if (IsConfigureIntercept)
+                            registrationBuilder.AddIntercept(type, false);
                     }
 
                 }
@@ -203,10 +204,10 @@ namespace OpenDeepSpace.Autofacastle.Extensions
 
                                     //设置生命周期
                                     registrationBuilder.InstancePerLifetimeScope();
-                                    //配置拦截
-                                    if (IsConfigureIntercept)
-                                        registrationBuilder.AddIntercept(type);
+
+
                                 }
+
                             }
                             else
                             {//未指定服务注入 查找实现的相关接口注入 
@@ -215,11 +216,14 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                                     registrationBuilder = AsServiceForGenericType(type, scopedAttr, registrationBuilder, service);
                                     //设置生命周期
                                     registrationBuilder.InstancePerLifetimeScope();
-                                    //配置拦截
-                                    if (IsConfigureIntercept)
-                                        registrationBuilder.AddIntercept(type);
+
+
                                 }
+
                             }
+                            //配置拦截
+                            if (IsConfigureIntercept)
+                                registrationBuilder.AddIntercept(type, false);
                         }
 
 
@@ -237,10 +241,9 @@ namespace OpenDeepSpace.Autofacastle.Extensions
 
                                 //设置生命周期
                                 registrationBuilder.InstancePerLifetimeScope();
-                                //配置拦截
-                                if (IsConfigureIntercept)
-                                    registrationBuilder.AddIntercept(type);
+
                             }
+
                         }
                         else
                         {//未指定服务注入 查找实现的相关接口注入 
@@ -249,11 +252,12 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                                 registrationBuilder = AsService(type, scopedAttr, registrationBuilder, service);
                                 //设置生命周期
                                 registrationBuilder.InstancePerLifetimeScope();
-                                //配置拦截
-                                if (IsConfigureIntercept)
-                                    registrationBuilder.AddIntercept(type);
+
                             }
                         }
+                        //配置拦截
+                        if (IsConfigureIntercept)
+                            registrationBuilder.AddIntercept(type, false);
                     }
                 }
 
@@ -278,10 +282,9 @@ namespace OpenDeepSpace.Autofacastle.Extensions
 
                                     //设置生命周期
                                     registrationBuilder.SingleInstance();
-                                    //配置拦截
-                                    if (IsConfigureIntercept)
-                                        registrationBuilder.AddIntercept(type);
+
                                 }
+
                             }
                             else
                             {//未指定服务注入 查找实现的相关接口注入 
@@ -290,11 +293,14 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                                     registrationBuilder = AsServiceForGenericType(type, singletonAttr, registrationBuilder, service);
                                     //设置生命周期
                                     registrationBuilder.SingleInstance();
-                                    //配置拦截
-                                    if (IsConfigureIntercept)
-                                        registrationBuilder.AddIntercept(type);
+
+
                                 }
+
                             }
+                            //配置拦截
+                            if (IsConfigureIntercept)
+                                registrationBuilder.AddIntercept(type, false);
                         }
 
 
@@ -315,10 +321,9 @@ namespace OpenDeepSpace.Autofacastle.Extensions
 
                                 //设置生命周期
                                 registrationBuilder.SingleInstance();
-                                //配置拦截
-                                if (IsConfigureIntercept)
-                                    registrationBuilder.AddIntercept(type);
+
                             }
+
                         }
                         else
                         {//未指定服务注入 查找实现的相关接口注入 
@@ -329,12 +334,13 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                                     registrationBuilder.AutoActivate();//预加载
                                 //设置生命周期
                                 registrationBuilder.SingleInstance();
-                                //配置拦截
-                                if (IsConfigureIntercept)
-                                    registrationBuilder.AddIntercept(type);
 
                             }
+
                         }
+                        //配置拦截
+                        if (IsConfigureIntercept)
+                            registrationBuilder.AddIntercept(type, false);
                     }
                 }
             }
@@ -358,8 +364,8 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                 registrationBuilder.Named(type.FullName, service);
 
             if (dependencyInjectionAttribute != null)
-            { 
-            
+            {
+
                 //如果存在Keyed
                 if (dependencyInjectionAttribute.Keyed != null)
                     registrationBuilder.Keyed(dependencyInjectionAttribute.Keyed, service);
@@ -380,6 +386,12 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         /// <param name="service"></param>
         private static IRegistrationBuilder<object, ReflectionActivatorData, DynamicRegistrationStyle> AsServiceForGenericType(Type type, DependencyInjectionAttribute dependencyInjectionAttr, IRegistrationBuilder<object, ReflectionActivatorData, DynamicRegistrationStyle> registrationBuilder, Type service)
         {
+
+            //如果直接获取的出来Ixxx<> FullName为空 
+            //针对泛型 FullName为空导致为非泛型 补充完整FullName 才能正确批量注入动态泛型
+            //例如(typeof(Ixxx<>),typeof(xxx()))
+            service = service.FixTypeReference();
+
             //作为服务
             registrationBuilder.As(service);
 
@@ -388,7 +400,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                 registrationBuilder.Named(type.FullName, service);
 
             if (dependencyInjectionAttr != null)
-            { 
+            {
                 //如果存在Keyed
                 if (dependencyInjectionAttr.Keyed != null)
                     registrationBuilder.Keyed(dependencyInjectionAttr.Keyed, service);
