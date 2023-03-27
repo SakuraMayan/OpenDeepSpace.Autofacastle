@@ -98,7 +98,12 @@ namespace OpenDeepSpace.Autofacastle.Extensions
 
         private static void BatchInjectionInternal(ContainerBuilder containerBuilder, IEnumerable<Type> types, bool IsConfigureIntercept = false)
         {
-            types = types.Where(t => t.IsClass && !t.IsAbstract);
+            //排序
+            types = types.Where(t => t.IsClass && !t.IsAbstract).OrderBy(t => t.GetCustomAttribute<TransientAttribute>() != null ? (t.GetCustomAttribute<TransientAttribute>() as IDependencyInjection).Order :
+            t.GetCustomAttribute<ScopedAttribute>() != null ? (t.GetCustomAttribute<ScopedAttribute>() as IDependencyInjection).Order
+            : t.GetCustomAttribute<SingletonAttribute>() != null ? (t.GetCustomAttribute<SingletonAttribute>() as IDependencyInjection).Order
+            : 0);
+
             foreach (var type in types)
             {
                 //瞬时

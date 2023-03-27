@@ -11,7 +11,8 @@ namespace Autofacastle.Demo.ConsoleApp.Services
     /// <summary>
     /// TransientService服务
     /// </summary>
-    public class TransientService : ITransientService, ITransient
+    [Transient(Order =99999)]
+    public class TransientService : ITransientService/*, ITransient*/
     {
         /// <summary>
         /// 由于设置了拦截筛选器将会自动注入无需使用AutomaticInjection特性

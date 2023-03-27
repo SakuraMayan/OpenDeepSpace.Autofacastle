@@ -10,7 +10,7 @@ namespace Autofacastle.Demo.ConsoleApp.Services
     /// <summary>
     /// 可以指定Keyed Named
     /// </summary>
-    [Transient(AsServices = new[] { typeof(ITransientService) }, Keyed = typeof(TransientUpgradeService), Named = nameof(TransientUpgradeService))]
+    [Transient(AsServices = new[] { typeof(ITransientService) }, Keyed = typeof(TransientUpgradeService), Named = nameof(TransientUpgradeService),Order =999)]
     public class TransientUpgradeService : ITransientService, IDisposable
     {
 

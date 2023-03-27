@@ -30,6 +30,12 @@ containerBuilder.RegisterType<ExternalService>().AsSelf().InstancePerDependency(
 //在不能使用特性注入的类中 需要获取容器中的类需要使用IocManager并初始化
 IocManager.InitContainer(containerBuilder.Build());
 
+//测试单接口多实现顺序
+ITransientService transientServiceMore = IocManager.Resolve<ITransientService>();
+
+transientServiceMore.BusinessOne();
+
+
 //测试自动注入 以及 通过特性注入实例
 ITransientService transientService= IocManager.Resolve<ITransientService>(ImplementationType: typeof(TransientService));
 

@@ -28,5 +28,10 @@ namespace OpenDeepSpace.Autofacastle.DependencyInjection
         /// 自定义Named
         /// </summary>
         string Named { get; set; }
+
+        /// <summary>
+        /// 排序 对于相同类型的依据序号优先加载 序号越小越先加载 即序号大的将覆盖序号小的
+        /// </summary>
+        int Order { get; set; }
     }
 }
