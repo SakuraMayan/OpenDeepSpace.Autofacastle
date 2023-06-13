@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
+namespace OpenDeepSpace.Autofacastle.Extensions
 {
     /// <summary>
     /// 

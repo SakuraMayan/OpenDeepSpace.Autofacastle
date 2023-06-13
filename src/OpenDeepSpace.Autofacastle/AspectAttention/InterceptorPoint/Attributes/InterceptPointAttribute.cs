@@ -1,4 +1,4 @@
-﻿using OpenDeepSpace.NetCore.Autofacastle.Extensions;
+﻿using OpenDeepSpace.Autofacastle.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
