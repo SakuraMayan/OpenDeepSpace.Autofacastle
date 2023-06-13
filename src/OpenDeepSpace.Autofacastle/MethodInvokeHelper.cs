@@ -68,6 +68,24 @@ namespace OpenDeepSpace.Autofacastle
                     continue;
                 }
 
+                var isNeedValueInjection = parameter.IsNeedValueInjection();
+                if (isNeedValueInjection)//值注入
+                {
+
+                    //为了兼容netcore值注入考虑 采用ioc方式来实现
+                    object valueInjection = null;
+                    context.TryResolve(typeof(IValueInjection),out valueInjection);
+
+                    if (valueInjection != null) //能获取到ValueInjection
+                    { 
+                        var value = (valueInjection as IValueInjection).ResolveValue(context,parameter);
+
+                        parameterObj.Add(value);
+                    
+                    }
+                    continue;
+                }
+
                 if (parameter.HasDefaultValue)
                 {
                     parameterObj.Add(parameter.RawDefaultValue);

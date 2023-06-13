@@ -91,6 +91,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                     .Where(m => !m.IsSpecialName).SelectMany(t => t.GetCustomAttributes());
         }
 
+
         /// <summary>
         /// 修复类型 获取到的泛型接口FullName为null
         /// </summary>

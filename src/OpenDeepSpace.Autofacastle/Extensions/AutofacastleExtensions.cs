@@ -18,9 +18,12 @@ namespace OpenDeepSpace.Autofacastle.Extensions
     {
         /// <summary>
         /// 
+        /// 该方法可与
+        /// <see cref="AutofacastleServiceProviderFactory"/>结合使用
+        /// 分别用来配置批量注入 特性依赖注入 以及切面拦截主要用于NetCore中
+        /// 
         /// 该方法与
-        /// <see cref="ContainerBuilderExtensions.BatchInjection(ContainerBuilder)"/>
-        /// 结合使用完成批量注入 特性依赖注入
+        /// <see cref="ContainerBuilderExtensions"/>结合使用完成批量注入 特性依赖注入
         /// 
         /// 或单独使用该方法来完成特性依赖注入
         /// 
@@ -50,7 +53,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         /// <param name="classInterceptSelectors"></param>
         /// <param name="IsConfigureIntercept"></param>
         /// <returns></returns>
-        public static ContainerBuilder UseAutofacastle(this ContainerBuilder containerBuilder, List<AutomaticInjectionSelector> automaticInjectionSelectors = null, List<NonInterceptSelector> nonInterceptSelectors = null, List<ClassInterceptSelector> classInterceptSelectors = null, bool IsConfigureIntercept=false)
+        public static ContainerBuilder UseAutofacastle(this ContainerBuilder containerBuilder, List<AutomaticInjectionSelector> automaticInjectionSelectors = null, List<NonInterceptSelector> nonInterceptSelectors = null,List<ClassInterceptSelector> classInterceptSelectors=null, bool IsConfigureIntercept=false)
         {
 
             if (automaticInjectionSelectors != null && automaticInjectionSelectors.Any())
@@ -86,7 +89,6 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         /// <param name="assemblies">程序集</param>
         /// <param name="automaticInjectionSelectors"></param>
         /// <param name="nonInterceptSelectors"></param>
-        /// <param name="classInterceptSelectors"></param>
         /// <param name="IsConfigureIntercept"></param>
         /// <returns></returns>
         public static ContainerBuilder UseAutofacastle(this ContainerBuilder containerBuilder,List<Assembly> assemblies,List<AutomaticInjectionSelector> automaticInjectionSelectors = null, List<NonInterceptSelector> nonInterceptSelectors = null,List<ClassInterceptSelector> classInterceptSelectors=null, bool IsConfigureIntercept = false)
@@ -96,7 +98,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                 AutofacastleCollection.AutomaticInjectionSelectors.AddRange(automaticInjectionSelectors);
             if (nonInterceptSelectors != null && nonInterceptSelectors.Any())
                 AutofacastleCollection.NonInterceptSelectors.AddRange(nonInterceptSelectors);
-            if(classInterceptSelectors!=null && classInterceptSelectors.Any())
+            if (classInterceptSelectors != null && classInterceptSelectors.Any())
                 AutofacastleCollection.ClassInterceptSelectors.AddRange(classInterceptSelectors);
 
             ContainerBuilderExtensions.IsConfigureIntercept = IsConfigureIntercept;
@@ -136,6 +138,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                 AutofacastleCollection.NonInterceptSelectors.AddRange(nonInterceptSelectors);
             if (classInterceptSelectors != null && classInterceptSelectors.Any())
                 AutofacastleCollection.ClassInterceptSelectors.AddRange(classInterceptSelectors);
+
 
             ContainerBuilderExtensions.IsConfigureIntercept = IsConfigureIntercept;
 

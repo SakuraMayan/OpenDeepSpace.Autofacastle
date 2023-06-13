@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\OpenDeepSpace.Autofacastle\OpenDeepSpace.Autofacastle.csproj" />
+    <ProjectReference Include="..\Autofacastle.Demo.Services\Autofacastle.Demo.Services.csproj" />
   </ItemGroup>
 
 </Project>

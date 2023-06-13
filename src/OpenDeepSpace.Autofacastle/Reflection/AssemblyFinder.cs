@@ -59,5 +59,21 @@ namespace OpenDeepSpace.Autofacastle.Reflection
             return list;
         }
 
+        /// <summary>
+        /// 添加外部的程序集
+        /// </summary>
+        /// <param name="assemblies"></param>
+        public static void AddExternalAssemblies(List<Assembly> assemblies)
+        {
+            if (assemblies == null)
+                return;
+
+            if (!assembliesCache.ContainsKey(AllAssemblies) || assembliesCache[AllAssemblies] == null)
+                GetAllAssemblies();
+            
+            assembliesCache[AllAssemblies].Union(assemblies);
+            
+        }
+
     }
 }

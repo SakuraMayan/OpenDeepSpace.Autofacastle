@@ -51,10 +51,10 @@ namespace OpenDeepSpace.Autofacastle.AspectAttention.Interceptor
                 List<MethodInfo> interfaceMethods = new List<MethodInfo>();
                 List<Attribute> interfaceInterceptAttrs = new List<Attribute>();
                 if (needInterceptClass.InterceptType == Enums.InterceptType.InterfaceIntercept)
-                {
-
-                    interfaceMethods = needInterceptClass.InterceptedType.GetInterfaces().SelectMany(t => t.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
-                      .Where(m => !m.IsSpecialName)).ToList();
+                { 
+                    
+                    interfaceMethods=needInterceptClass.InterceptedType.GetInterfaces().SelectMany(t=>t.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                    .Where(m => !m.IsSpecialName)).ToList();
 
                     interfaceInterceptAttrs = needInterceptClass.InterceptedType.GetInterfaces().SelectMany(t => t.GetCustomAttributes().SelectInterceptAttrs()).Distinct().ToList();
                 }
@@ -73,7 +73,7 @@ namespace OpenDeepSpace.Autofacastle.AspectAttention.Interceptor
                     List<Attribute> interfaceMethodAttributes = new List<Attribute>();
                     if (interfaceMethods.Any())
                     {
-                        var interfaceMethod = interfaceMethods.FirstOrDefault(t => t.ReturnType == method.ReturnType && t.Name == method.Name && t.GetParameters().Length == method.GetParameters().Length && t.GetParameters().All(a => method.GetParameters().Contains(a)));
+                        var interfaceMethod = interfaceMethods.FirstOrDefault(t => t.ReturnType==method.ReturnType && t.Name==method.Name && t.GetParameters().Length==method.GetParameters().Length && t.GetParameters().All(t1=>method.GetParameters().Contains(t1)));
                         if (interfaceMethod != null)
                             interfaceMethodAttributes = interfaceMethod.GetCustomAttributes().ToList();
                     }
@@ -127,14 +127,14 @@ namespace OpenDeepSpace.Autofacastle.AspectAttention.Interceptor
                                 else
                                     throw new Exception($"{groupName}组中已经存在一个{InterceptSurface.MethodAfterIntercept}实现{interceptBaseType}的拦截特性,考虑需要为{interceptAttr.GetType()}使用GroupName进行分组");
                             }
-                            if (InterceptSurface.MethodAfterThrowingIntercept != null && interceptBaseType == typeof(MethodAfterThrowingAbstractInterceptAttribute)) 
+                            if (InterceptSurface.MethodAfterThrowingIntercept != null && interceptBaseType == typeof(MethodAfterThrowingAbstractInterceptAttribute))
                             {
                                 if (string.IsNullOrWhiteSpace(groupName))
                                     throw new Exception($"默认组中已经存在一个{InterceptSurface.MethodAfterThrowingIntercept}实现{interceptBaseType}的拦截特性,考虑需要为{interceptAttr.GetType()}使用GroupName进行分组");
                                 else
                                     throw new Exception($"{groupName}组中已经存在一个{InterceptSurface.MethodAfterThrowingIntercept}实现{interceptBaseType}的拦截特性,考虑需要为{interceptAttr.GetType()}使用GroupName进行分组");
                             }
-                            if (InterceptSurface.MethodAroundIntercept != null && interceptBaseType == typeof(MethodAroundAbstractInterceptAttribute)) 
+                            if (InterceptSurface.MethodAroundIntercept != null && interceptBaseType == typeof(MethodAroundAbstractInterceptAttribute))
                             {
                                 if (string.IsNullOrWhiteSpace(groupName))
                                     throw new Exception($"默认组中已经存在一个{InterceptSurface.MethodAroundIntercept}实现{interceptBaseType}的拦截特性,考虑需要为{interceptAttr.GetType()}使用GroupName进行分组");

@@ -14,11 +14,10 @@ namespace OpenDeepSpace.Autofacastle.DependencyInjection
     public class IocManager
     {
         private static readonly object obj = new object();
-
         private static ILifetimeScope Container { get; set; }
 
         //单例模式
-        public static void InitContainer(IContainer container)
+        public static void InitContainer(ILifetimeScope container)
         {
             //防止过程中方法被调用_container发生改变
             if (Container == null)
@@ -32,37 +31,6 @@ namespace OpenDeepSpace.Autofacastle.DependencyInjection
                 }
             }
         }
-
-        public static void InitContainer(ContainerBuilder container)
-        {
-            //防止过程中方法被调用_container发生改变
-            if (Container == null)
-            {
-                lock (obj)
-                {
-                    if (Container == null)
-                    {
-                        Container = container.Build();//Build只能被调用一次
-                    }
-                }
-            }
-        }
-
-        public static void InitContainer(ILifetimeScope lifetimeScope)
-        {
-            //防止过程中方法被调用_container发生改变
-            if (Container == null)
-            {
-                lock (obj)
-                {
-                    if (Container == null)
-                    {
-                        Container = lifetimeScope;
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// 解析实例 能够明确知道能从其中解析出来 否则出现异常 请使用<see cref="TryResolve{TService}"/>该方法来解析
         /// </summary>
@@ -101,7 +69,7 @@ namespace OpenDeepSpace.Autofacastle.DependencyInjection
         /// <param name="resolveMode">解析模式 默认为<see cref="ResolveMode.Keyed"/>从Keyed来解析</param>
         /// <param name="ImplementationType"></param>
         /// <returns></returns>
-        public static TService Resolve<TService>(Type ImplementationType,ResolveMode resolveMode=ResolveMode.Keyed)
+        public static TService Resolve<TService>(Type ImplementationType,ResolveMode resolveMode=ResolveMode.Keyed) 
         {
             if (Container == null)
                 throw new ArgumentException(nameof(Container));
@@ -165,7 +133,7 @@ namespace OpenDeepSpace.Autofacastle.DependencyInjection
         /// <typeparam name="TService"></typeparam>
         /// <param name="Keyed"></param>
         /// <returns></returns>
-        public static TService Resolve<TService>(object Keyed)
+        public static TService Resolve<TService>(object Keyed) 
         {
             if (Container == null)
                 throw new ArgumentException(nameof(Container));

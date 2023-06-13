@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenDeepSpace.Autofacastle.Extensions
+namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
 {
     /// <summary>
     /// 
@@ -173,7 +173,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
             if (originString.Length < removeString.Length)
                 throw new Exception($"原始字符串长度小于要删除的字符串长度");
 
-            return originString.Substring(removeString.Length);
+            return originString.Substring(removeString.Length,originString.Length-removeString.Length);
 
         }
 
@@ -196,7 +196,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
 
 
 
-            return originString.Substring(0, originString.Length - removeString.Length);
+            return originString.Substring(0,originString.Length-removeString.Length);
 
         }
 

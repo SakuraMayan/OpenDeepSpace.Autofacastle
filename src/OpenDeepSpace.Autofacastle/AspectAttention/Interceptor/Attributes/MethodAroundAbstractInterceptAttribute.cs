@@ -8,7 +8,7 @@ namespace OpenDeepSpace.Autofacastle.AspectAttention.Interceptor.Attributes
     /// <summary>
     /// 方法执行前后执行 环绕执行
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Interface)]
     public abstract class MethodAroundAbstractInterceptAttribute : MethodInterceptBaseAttribute
     {
         ///// <summary>

@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using OpenDeepSpace.Autofacastle.AspectAttention.Interceptor;
 using OpenDeepSpace.Autofacastle.DependencyInjection.Attributes;
+using OpenDeepSpace.Autofacastle.AspectAttention.InterceptorPoint;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenDeepSpace.Autofacastle.AspectAttention.InterceptorPoint;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;

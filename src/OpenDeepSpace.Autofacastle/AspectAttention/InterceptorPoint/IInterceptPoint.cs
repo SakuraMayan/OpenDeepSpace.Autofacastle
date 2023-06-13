@@ -16,7 +16,8 @@ namespace OpenDeepSpace.Autofacastle.AspectAttention.InterceptorPoint
         //Task AroundBefore(InterceptContext interceptContext);
 
         //Task AroundAfter(InterceptContext interceptContext);
-        
+
+
         void Before();
 
 

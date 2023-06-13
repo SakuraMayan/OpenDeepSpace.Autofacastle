@@ -77,9 +77,9 @@ namespace OpenDeepSpace.Autofacastle.Extensions
             if (memberInfo != null)
             {
                 if ((memberInfo as PropertyInfo) != null)
-                    serviceType = ((PropertyInfo)memberInfo).PropertyType;
+                    serviceType = (memberInfo as PropertyInfo).PropertyType;
                 if ((memberInfo as FieldInfo) != null)
-                    serviceType = ((FieldInfo)memberInfo).FieldType;
+                    serviceType = (memberInfo as FieldInfo).FieldType;
             }
             if (parameterInfo != null)
                 serviceType = parameterInfo.ParameterType;
@@ -105,20 +105,28 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                 //如果实现类型不为空 
                 if (implementationType != null)
                 {
-                    
-                    resolveRequestContext.TryResolveKeyed(implementationType, serviceType, out serviceInstance);
-                    if (serviceInstance == null && implementationType.FullName != null)
-                    {
+                    /*//非泛型 或 是泛型但不是IOptions<> 尝试优先以Keyed去解析
+                    if (!implementationType.IsGenericType || implementationType.IsGenericType && typeof(IOptions<>) != implementationType.GetGenericTypeDefinition())
+                    {*/
+
+                        resolveRequestContext.TryResolveKeyed(implementationType, serviceType, out serviceInstance);
+                        if (serviceInstance == null && implementationType.FullName != null)
+                        {
                        
-                        //通过Keyed未能解析出实例 尝试通过Named去解析
-                        resolveRequestContext.TryResolveNamed(implementationType.FullName, serviceType, out serviceInstance);
+                            //通过Keyed未能解析出实例 尝试通过Named去解析
+                            resolveRequestContext.TryResolveNamed(implementationType.FullName, serviceType, out serviceInstance);
 
-                    }
+                        }
 
-                    //通过keyed和Named都未解析出实例 尝试直接通过实现类型去解析
-                    if (serviceInstance == null)
+                        //通过keyed和Named都未解析出实例 尝试直接通过实现类型去解析
+                        if (serviceInstance == null)
+                            resolveRequestContext.TryResolve(implementationType, out serviceInstance);
+                    /*}
+                    else
+                    {
                         resolveRequestContext.TryResolve(implementationType, out serviceInstance);
-                    
+                    }*/
+
                 }
                 else if (Keyed != null)//Keyed不为空
                 {
@@ -148,16 +156,25 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                 //如果实现类型不为空 
                 if (implementationType != null)
                 {
-                    componentContext.TryResolveKeyed(implementationType, serviceType, out serviceInstance);
-                    if (serviceInstance == null && implementationType.FullName != null)
-                    {
-                        //通过Keyed未能解析出实例 尝试通过Named去解析
-                        componentContext.TryResolveNamed(implementationType.FullName,serviceType, out serviceInstance);
+                    /*//非泛型 或 是泛型但不是IOptions<> 尝试优先以Keyed去解析
+                    if (!implementationType.IsGenericType || implementationType.IsGenericType && typeof(IOptions<>) != implementationType.GetGenericTypeDefinition())
+                    {*/
 
-                    }
-                    //通过keyed和Named都未解析出实例 尝试直接通过实现类型去解析
-                    if (serviceInstance == null)
+                        componentContext.TryResolveKeyed(implementationType, serviceType, out serviceInstance);
+                        if (serviceInstance == null && implementationType.FullName != null)
+                        {
+                            //通过Keyed未能解析出实例 尝试通过Named去解析
+                            componentContext.TryResolveNamed(implementationType.FullName,serviceType, out serviceInstance);
+
+                        }
+                        //通过keyed和Named都未解析出实例 尝试直接通过实现类型去解析
+                        if (serviceInstance == null)
+                            componentContext.TryResolve(implementationType, out serviceInstance);
+                    /*}
+                    else
+                    {
                         componentContext.TryResolve(implementationType, out serviceInstance);
+                    }*/
                     
 
                 }
@@ -182,6 +199,18 @@ namespace OpenDeepSpace.Autofacastle.Extensions
 
                 }
             }
+
+
+
+            //IOptions<>解析出泛型值 为了netcore兼容采用ioc方式实现
+            object optionsInjection = null;
+            if (resolveRequestContext != null)
+                resolveRequestContext.TryResolve(typeof(IOptionsInjection), out optionsInjection);
+            if (componentContext!=null)
+                componentContext.TryResolve(typeof(IOptionsInjection),out optionsInjection);
+            if (optionsInjection != null)
+               serviceInstance = (optionsInjection as IOptionsInjection).ResolveOptions(serviceInstance, serviceType, implementationType);
+
 
             return serviceInstance;
         }

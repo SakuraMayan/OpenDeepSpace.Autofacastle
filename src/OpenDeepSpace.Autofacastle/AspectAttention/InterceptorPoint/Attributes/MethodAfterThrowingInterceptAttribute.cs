@@ -19,7 +19,7 @@ namespace OpenDeepSpace.Autofacastle.AspectAttention.InterceptorPoint.Attributes
         public Type ExceptionType { get; set; }
 
         /// <summary>
-        /// 抛出返回异常参数
+        /// 返回异常参数
         /// </summary>
         public string Throwing { get; set; }
     }

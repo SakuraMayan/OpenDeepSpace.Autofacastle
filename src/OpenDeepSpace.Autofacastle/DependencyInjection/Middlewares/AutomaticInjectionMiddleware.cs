@@ -42,7 +42,6 @@ namespace OpenDeepSpace.Autofacastle.DependencyInjection.Middlewares
                 foreach (var propertyInfo in propertyInfos)
                 {
                     ResolveInjection(instance, instanceType, propertyInfo, context);
-                    
                 }
 
                 //获取字段 不包含基类的
@@ -50,7 +49,6 @@ namespace OpenDeepSpace.Autofacastle.DependencyInjection.Middlewares
                 foreach (var fieldInfo in fieldInfos)
                 {
                     ResolveInjection(instance, instanceType, fieldInfo, context);
-                    
                 }
             }
 

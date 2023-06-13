@@ -29,8 +29,7 @@ namespace Autofac.Extras.DynamicProxy
 
         private static readonly object InterceptorsForGenericMethodCacheLock = new object();
 
-        private static readonly object lockobj = new object();
-
+        private static readonly object lockobj=new object();
 
         /// <summary>
         /// Enable class interception on the target type. Interceptors will be determined
@@ -242,6 +241,7 @@ namespace Autofac.Extras.DynamicProxy
                 registration.ConfigurePipeline(p => p.Use(PipelinePhase.Activation, MiddlewareInsertionMode.StartOfPhase, (ctxt, next) =>
                 {
                     next(ctxt);
+
                     registInterceptorsForGenericMethodCache(ctxt);
 
                     var proxiedInterfaces = ctxt.Instance
@@ -287,8 +287,8 @@ namespace Autofac.Extras.DynamicProxy
 
             //防止并发访问 出现System.ArgumentException: An item with the same key has already been added. Key: Autofac.Extras.DynamicProxy.RegistrationExtensions.InterceptorsForGenericMethodCache
             lock (InterceptorsForGenericMethodCacheLock)
-            { 
-            
+            {
+
                 if (!ctxt.Registration.Metadata.TryGetValue(InterceptorsForGenericMethodCache, out var _))
                 {
                     ctxt.Registration.Metadata.Add(InterceptorsForGenericMethodCache, true);
@@ -380,7 +380,6 @@ namespace Autofac.Extras.DynamicProxy
         /// <param name="interceptorType"></param>
         public static IComponentRegistration InterceptedBy(this IComponentRegistration builder, Type interceptorType)
         {
-
             lock (lockobj)
             { 
             
@@ -411,9 +410,9 @@ namespace Autofac.Extras.DynamicProxy
         {
             lock (lockobj)
             { 
-            
                 builder.Metadata.Add(key, value);
                 return builder;
+            
             }
 
         }

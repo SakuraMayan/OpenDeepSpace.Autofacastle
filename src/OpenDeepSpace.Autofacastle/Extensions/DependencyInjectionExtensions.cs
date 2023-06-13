@@ -23,7 +23,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         public static Type[] FilterDependencyInjectionInterfaces(this Type[] types)
         {
 
-            types = types.Where(t => t != typeof(ITransient) && t != typeof(IScoped) && t != typeof(ISingleton) && t != typeof(INonIntercept) && t != typeof(IClassIntercept)).ToArray();
+            types = types.Where(t => t != typeof(ITransient) && t != typeof(IScoped) && t != typeof(ISingleton) && t!=typeof(INonIntercept) && t!=typeof(IClassIntercept)).ToArray();
 
             return types;
         }
@@ -56,7 +56,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         /// </summary>
         /// <param name="type"></param>
         /// <param name="dependencyInjectionAttribute"></param>
-        public static void TryAddExistSameKeyed(this Type type, DependencyInjectionAttribute dependencyInjectionAttribute)
+        public static void TryAddExistSameKeyed(this Type type,DependencyInjectionAttribute dependencyInjectionAttribute)
         {
             //如果Keyed不为空
             if (dependencyInjectionAttribute != null && dependencyInjectionAttribute.Keyed != null)
@@ -78,7 +78,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         /// </summary>
         /// <param name="type"></param>
         /// <param name="dependencyInjectionAttribute"></param>
-        public static void TryAddExistSameNamed(this Type type, DependencyInjectionAttribute dependencyInjectionAttribute)
+        public static void TryAddExistSameNamed(this Type type,DependencyInjectionAttribute dependencyInjectionAttribute)
         {
             //如果Named不为空
             if (dependencyInjectionAttribute != null && !string.IsNullOrWhiteSpace(dependencyInjectionAttribute.Named))

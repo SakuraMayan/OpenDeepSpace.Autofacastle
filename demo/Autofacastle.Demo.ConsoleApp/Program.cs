@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Autofac;
 using Autofacastle.Demo.ConsoleApp.Services;
+using Autofacastle.Demo.Services;
 using OpenDeepSpace.Autofacastle.DependencyInjection;
 using OpenDeepSpace.Autofacastle.Extensions;
 
@@ -49,3 +50,7 @@ transientService.BusinessTwo();
 //外部注入的类的切面拦截ExternalService
 var externalService = IocManager.Resolve<ExternalService>();
 externalService.BusinessOne();
+
+//分层服务
+var layerService = IocManager.Resolve<ILayerService>();
+layerService.test();

@@ -22,9 +22,9 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         /// <param name="implementationType"></param>
         /// <param name="Intercepted">是否可被重复添加拦截</param>
         /// <returns></returns>
-        public static IRegistrationBuilder<object, ReflectionActivatorData, DynamicRegistrationStyle> AddIntercept(this IRegistrationBuilder<object, ReflectionActivatorData, DynamicRegistrationStyle> registrationBuilder, Type implementationType, bool Intercepted = true)
+        public static IRegistrationBuilder<object, ReflectionActivatorData, DynamicRegistrationStyle> AddIntercept(this IRegistrationBuilder<object, ReflectionActivatorData, DynamicRegistrationStyle> registrationBuilder, Type implementationType,bool Intercepted = true)
         {
-            var interceptedTypeInfo = AutofacastleCollection.InterceptedTypeInfos.FirstOrDefault(t => t.InterceptedType == implementationType && t.Intercepted == false);
+            var interceptedTypeInfo = AutofacastleCollection.InterceptedTypeInfos.FirstOrDefault(t => t.InterceptedType == implementationType && t.Intercepted==false);
             if (interceptedTypeInfo != null)
             {
                 if (interceptedTypeInfo.IsInterceptPointAbstractIntercept)
@@ -79,9 +79,9 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         /// <param name="implementationType"></param>
         /// <param name="Intercepted">是否可被重复添加拦截</param>
         /// <returns></returns>
-        public static IRegistrationBuilder<object, ConcreteReflectionActivatorData, SingleRegistrationStyle> AddIntercept(this IRegistrationBuilder<object, ConcreteReflectionActivatorData, SingleRegistrationStyle> registrationBuilder, Type implementationType, bool Intercepted = true)
+        public static IRegistrationBuilder<object, ConcreteReflectionActivatorData, SingleRegistrationStyle> AddIntercept(this IRegistrationBuilder<object, ConcreteReflectionActivatorData, SingleRegistrationStyle> registrationBuilder, Type implementationType,bool Intercepted=true)
         {
-            var interceptedTypeInfo = AutofacastleCollection.InterceptedTypeInfos.FirstOrDefault(t => t.InterceptedType == implementationType && t.Intercepted == false);
+            var interceptedTypeInfo = AutofacastleCollection.InterceptedTypeInfos.FirstOrDefault(t => t.InterceptedType == implementationType && t.Intercepted==false);
             if (interceptedTypeInfo != null)
             {
                 if (interceptedTypeInfo.IsInterceptPointAbstractIntercept)
@@ -124,7 +124,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                             break;
                     }
                 }
-                interceptedTypeInfo.Intercepted = !Intercepted;
+                interceptedTypeInfo.Intercepted =  !Intercepted;
             }
             return registrationBuilder;
 

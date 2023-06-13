@@ -11,7 +11,7 @@ namespace OpenDeepSpace.Autofacastle.AspectAttention.Interceptor.Attributes
     public class MethodInterceptBaseAttribute : Attribute
     {
         /// <summary>
-        /// 拦截优先级序号 order越小优先级越高 同已分组的order应相同
+        /// 拦截优先级序号 order越小优先级越高
         /// </summary>
         public int Order { get; set; }
 

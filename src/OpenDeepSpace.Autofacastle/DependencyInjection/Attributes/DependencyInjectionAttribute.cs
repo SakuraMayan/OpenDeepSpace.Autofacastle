@@ -13,6 +13,7 @@ namespace OpenDeepSpace.Autofacastle.DependencyInjection.Attributes
     public class DependencyInjectionAttribute : Attribute, IDependencyInjection
     {
         public Type[] AsServices { get ; set ; }
+        public Type[] ReplaceServices { get ; set ; }
         public object Keyed { get ; set ; }
         public string Named { get; set; }
         public int Order { get ; set ; }

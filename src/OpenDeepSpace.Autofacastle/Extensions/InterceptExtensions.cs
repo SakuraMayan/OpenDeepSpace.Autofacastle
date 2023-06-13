@@ -203,7 +203,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                 return type.GetCustomAttributes().SelectInterceptAttrs().Any() || type.GetMethodsAttributes().SelectInterceptAttrs().Any()
                     || type.GetInterfaces().SelectMany(t => t.GetCustomAttributes().SelectInterceptAttrs()).Any()
                     || type.GetInterfaces().SelectMany(t => t.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
-                    .Where(m => !m.IsSpecialName).SelectMany(a => a.GetCustomAttributes().SelectInterceptAttrs())).Any();
+                    .Where(m => !m.IsSpecialName).SelectMany(t1 => t1.GetCustomAttributes().SelectInterceptAttrs())).Any();
 
             }
 
@@ -231,15 +231,15 @@ namespace OpenDeepSpace.Autofacastle.Extensions
             // 过滤掉依赖注入接口之后没有实现实际接口的类 所有方法都不是虚方法的不能被拦截[拦截无意义]
             if (type.GetCustomAttribute<NonInterceptAttribute>() != null
                 ||
-                type.Assembly == typeof(NonInterceptAttribute).Assembly
+                type.Assembly == typeof(NonInterceptAttribute).Assembly 
                 ||
                 type.GetInterfaces().Any(t => t == typeof(INonIntercept))
-                ||
+                || 
                 type.GetCustomAttribute<InterceptPointAttribute>() != null
+                || 
+                (type.GetCustomAttribute<ClassInterceptAttribute>()!=null && type.GetMethods().All(t=>!t.IsVirtual))
                 ||
-                (type.GetCustomAttribute<ClassInterceptAttribute>() != null && type.GetMethods().All(t => !t.IsVirtual))
-                ||
-                (type.GetInterfaces().Any(t => t == typeof(IClassIntercept)) && type.GetMethods().All(t => !t.IsVirtual))
+                (type.GetInterfaces().Any(t=>t==typeof(IClassIntercept)) && type.GetMethods().All(t => !t.IsVirtual))
                 ||
                 (!type.GetInterfaces().FilterDependencyInjectionInterfaces().Any() && type.GetMethods().All(t => !t.IsVirtual))
                 )
@@ -297,7 +297,6 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                 //检查方法拦截 包含基类的方法
                 foreach (var methodInfo in type.GetAllInstanceMethod(true))
                 {
-
                     //方法上标注有NonIntercept不拦截特性将不拦截
                     if (methodInfo.GetCustomAttribute<NonInterceptAttribute>() != null)
                         continue;
@@ -365,8 +364,9 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                 return false;
 
             //满足类拦截筛选器的将采用类拦截
-            if (AutofacastleCollection.ClassInterceptSelectors != null && AutofacastleCollection.ClassInterceptSelectors.Any(t => t.Predicate(type)))
+            if (AutofacastleCollection.ClassInterceptSelectors!=null && AutofacastleCollection.ClassInterceptSelectors.Any(t => t.Predicate(type)))
                 return false;
+
 
             //存在AsServices看AsServices的类型 如果AsServices不存在任何接口 即为类拦截
             var AsServices = type.GetCustomAttribute<TransientAttribute>()?.AsServices;

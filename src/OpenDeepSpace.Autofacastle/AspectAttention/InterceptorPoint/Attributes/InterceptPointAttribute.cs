@@ -1,4 +1,4 @@
-﻿using OpenDeepSpace.Autofacastle.Extensions;
+﻿using OpenDeepSpace.NetCore.Autofacastle.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,7 +97,7 @@ namespace OpenDeepSpace.Autofacastle.AspectAttention.InterceptorPoint.Attributes
             var interceptBody = _interceptExpression.RemoveStartAndEnd("intercept(", ")");
 
             //通过空格分割出
-            var bodies = interceptBody.Split(new string[] { " " },StringSplitOptions.RemoveEmptyEntries);
+            var bodies = interceptBody.Split(new[] { " "}, StringSplitOptions.RemoveEmptyEntries);
 
             _returnType = bodies[0];
             _nameSpace = bodies[1];
@@ -113,7 +113,7 @@ namespace OpenDeepSpace.Autofacastle.AspectAttention.InterceptorPoint.Attributes
 
 
             //方法参数类型按逗号分割
-            var splitParams = methodParamsType.RemoveStartAndEnd("(", ")").Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            var splitParams = methodParamsType.RemoveStartAndEnd("(", ")").Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
             //如果方法参数类型分割出来大于1 并且某个包含..即任意个数参数类型 不合法 比如 System.Threading.Tasks.Task,..
             if (splitParams.Length > 1 && splitParams.Any(t => t == ".."))
                 throw new Exception("任意个数参数类型不能与具体参数混合使用");
