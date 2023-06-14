@@ -154,9 +154,7 @@ namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
                             var fixService = service.FixTypeReference();
                             services.AddSingleton(fixService, type);
                         }
-                        //是否预加载 且不能是动态泛型
-                        if (singletonAttr.AutoActivate && !type.IsGenericTypeDefinition)
-                            AutofacastleCollection.AutoActives.Add(type);
+                        
                     }
                     else
                     {//未指定服务注入 查找实现的相关接口注入 
@@ -167,6 +165,10 @@ namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
                             services.AddSingleton(fixService, type);
                         }
                     }
+
+                    //是否预加载 且不能是动态泛型
+                    if (singletonAttr!=null && singletonAttr.AutoActivate && !type.IsGenericTypeDefinition)
+                        AutofacastleCollection.AutoActives.Add(type);
 
                 }
             }
