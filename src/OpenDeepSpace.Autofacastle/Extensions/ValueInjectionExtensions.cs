@@ -84,5 +84,46 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                 return false;
             return true;
         }
+
+
+        /// <summary>
+        /// 解析值
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="memberInfo"></param>
+        /// <returns></returns>
+        public static object ResolveValue(this ResolveRequestContext context, MemberInfo memberInfo)
+        {
+            return ResolveValue(context, null, memberInfo, null);
+        }
+
+        /// <summary>
+        /// 解析值
+        /// </summary>
+        /// <param name="componentContext"></param>
+        /// <param name="parameterInfo"></param>
+        /// <returns></returns>
+        public static object ResolveValue(this IComponentContext componentContext, ParameterInfo parameterInfo)
+        {
+            return ResolveValue(null, componentContext, null, parameterInfo);
+        }
+
+        private static object ResolveValue(ResolveRequestContext context, IComponentContext componentContext, MemberInfo memberInfo, ParameterInfo parameterInfo)
+        {
+
+            object value = null;
+
+            //通过ioc解析 IValueInjection实现来完成值的注入 兼容性考虑
+            object valueInjection = null;
+            if (context != null)
+                context.TryResolve(typeof(IValueInjection), out valueInjection);
+            if (componentContext != null)
+                componentContext.TryResolve(typeof(IValueInjection), out valueInjection);
+
+            if (valueInjection != null)//存在实现
+               value = (valueInjection as IValueInjection).ResolveValue(context, componentContext, memberInfo, parameterInfo);
+
+            return value;
+        }
     }
 }

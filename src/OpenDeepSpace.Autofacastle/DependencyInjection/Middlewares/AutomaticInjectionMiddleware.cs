@@ -13,7 +13,7 @@ namespace OpenDeepSpace.Autofacastle.DependencyInjection.Middlewares
     /// <summary>
     /// 自动注入实例中间件
     /// </summary>
-    internal class AutomaticInjectionMiddleware : IResolveMiddleware
+    public class AutomaticInjectionMiddleware : IResolveMiddleware
     {
         public PipelinePhase Phase => PipelinePhase.RegistrationPipelineStart;
 
@@ -42,6 +42,7 @@ namespace OpenDeepSpace.Autofacastle.DependencyInjection.Middlewares
                 foreach (var propertyInfo in propertyInfos)
                 {
                     ResolveInjection(instance, instanceType, propertyInfo, context);
+                    ValueInjection(instance, propertyInfo, context);
                 }
 
                 //获取字段 不包含基类的
@@ -49,6 +50,7 @@ namespace OpenDeepSpace.Autofacastle.DependencyInjection.Middlewares
                 foreach (var fieldInfo in fieldInfos)
                 {
                     ResolveInjection(instance, instanceType, fieldInfo, context);
+                    ValueInjection(instance, fieldInfo, context);
                 }
             }
 
@@ -78,6 +80,27 @@ namespace OpenDeepSpace.Autofacastle.DependencyInjection.Middlewares
             }
         }
 
-        
+        /// <summary>
+        /// 值注入
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="memberInfo"></param>
+        /// <param name="context"></param>
+        private static void ValueInjection(object instance, MemberInfo memberInfo, ResolveRequestContext context)
+        {
+            //判断是否需要值注入
+            bool result = memberInfo.IsNeedValueInjection();
+            if (!result)
+                return;
+            //获取值
+            object value = context.ResolveValue(memberInfo);
+
+            if (value != null)
+            {
+                (memberInfo as PropertyInfo)?.SetValue(instance, value);
+                (memberInfo as FieldInfo)?.SetValue(instance, value);
+            }
+
+        }
     }
 }

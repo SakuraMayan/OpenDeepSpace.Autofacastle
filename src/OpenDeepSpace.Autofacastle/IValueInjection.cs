@@ -30,6 +30,7 @@ Description:
 ===================================================================================================*/
 
 using Autofac;
+using Autofac.Core.Resolving.Pipeline;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -43,7 +44,7 @@ namespace OpenDeepSpace.Autofacastle
     /// </summary>
     public interface IValueInjection
     {
-        object ResolveValue(IComponentContext componentContext, ParameterInfo parameterInfo);
-        
+        object ResolveValue(ResolveRequestContext context, IComponentContext componentContext, MemberInfo memberInfo, ParameterInfo parameterInfo);
+
     }
 }

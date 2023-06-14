@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using OpenDeepSpace.Autofacastle.AspectAttention;
 using OpenDeepSpace.Autofacastle.DependencyInjection;
+using OpenDeepSpace.Autofacastle.DependencyInjection.Middlewares;
 using OpenDeepSpace.Autofacastle.Reflection;
 using OpenDeepSpace.NetCore.Autofacastle.Reflection;
 using System;
@@ -52,7 +53,7 @@ namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
                     args.ComponentRegistration.PipelineBuilding += (s, pipeline) =>
                     {
 
-                        pipeline.Use(new Autofacastle.AutomaticInjectionMiddleware());
+                        pipeline.Use(new AutomaticInjectionMiddleware());
                     };
                 };
             });

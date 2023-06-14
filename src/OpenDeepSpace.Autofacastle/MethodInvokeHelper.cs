@@ -73,16 +73,12 @@ namespace OpenDeepSpace.Autofacastle
                 {
 
                     //为了兼容netcore值注入考虑 采用ioc方式来实现
-                    object valueInjection = null;
-                    context.TryResolve(typeof(IValueInjection),out valueInjection);
 
-                    if (valueInjection != null) //能获取到ValueInjection
-                    { 
-                        var value = (valueInjection as IValueInjection).ResolveValue(context,parameter);
+                    var value = context.ResolveValue(parameter);
 
-                        parameterObj.Add(value);
+                    parameterObj.Add(value);
                     
-                    }
+                    
                     continue;
                 }
 
