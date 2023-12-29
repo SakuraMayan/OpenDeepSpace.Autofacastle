@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenDeepSpace.Autofacastle.DependencyInjection;
 using OpenDeepSpace.Autofacastle.DependencyInjection.Attributes;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using OpenDeepSpace.Autofacastle.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +12,7 @@ using System.Threading.Tasks;
 using OpenDeepSpace.Autofacastle.AspectAttention.InterceptorPoint;
 using OpenDeepSpace.Autofacastle.Extensions;
 using OpenDeepSpace.Autofacastle;
+using Autofac.Extensions.DependencyInjection;
 
 namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
 {
@@ -25,7 +25,7 @@ namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
         /// <param name="services"></param>
         /// <param name="assemblies">程序集</param>
         /// <returns></returns>
-        public static IServiceCollection BatchInjection(this ServiceCollection services, List<Assembly> assemblies)
+        public static IServiceCollection BatchInjection(this ServiceCollection services, IEnumerable<Assembly> assemblies)
         {
             if (assemblies == null)
                 throw new ArgumentNullException(nameof(assemblies));
@@ -43,7 +43,7 @@ namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
         /// <param name="services"></param>
         /// <param name="types">类型集合</param>
         /// <returns></returns>
-        public static IServiceCollection BatchInjection(this IServiceCollection services, List<Type> types)
+        public static IServiceCollection BatchInjection(this IServiceCollection services, IEnumerable<Type> types)
         {
             if (types == null)
                 throw new ArgumentNullException(nameof(types));
@@ -54,22 +54,11 @@ namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
         }
 
 
-        /// <summary>
-        /// 批量注入
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        public static IServiceCollection BatchInjection(this IServiceCollection services)
-        {
-            //获取类型
-            var types = TypeFinder.GetAllTypes();
-            BatchInjectionInternal(services, types);
-
-            return services;
-        }
+      
 
         private static void BatchInjectionInternal(IServiceCollection services, IEnumerable<Type> types)
         {
+            types = types = types.Union(typeof(ServiceCollectionExtensions).Assembly.GetTypes());
 
             //排序 暂时这样调整 实际上应该按照实现类 来进行分组排序的
             types = types.Where(t => t.IsClass && !t.IsAbstract).OrderBy(t => t is IImplementServiceOrder ? (t as IImplementServiceOrder).ImplementServiceOrder : t.GetCustomAttribute<TransientAttribute>() != null ? (t.GetCustomAttribute<TransientAttribute>() as IImplementServiceOrder).ImplementServiceOrder :
@@ -180,14 +169,14 @@ namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
         /// <param name="services"></param>
         /// <param name="assemblies"></param>
         /// <returns></returns>
-        public static IServiceCollection ReplaceServices(this IServiceCollection services, List<Assembly> assemblies)
+        public static IServiceCollection ReplaceServices(this IServiceCollection services, IEnumerable<Assembly> assemblies)
         {
             if (assemblies == null)
                 throw new ArgumentNullException(nameof(assemblies));
 
             var types = assemblies.SelectMany(t => t.GetTypes());
 
-            ReplaceServicesInternal(services, types);
+            services.ReplaceServices(types);
 
             return services;
         }
@@ -198,7 +187,7 @@ namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
         /// <param name="services"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public static IServiceCollection ReplaceServices(this ServiceCollection services, List<Type> types)
+        public static IServiceCollection ReplaceServices(this IServiceCollection services, IEnumerable<Type> types)
         {
             if (types == null)
                 throw new ArgumentNullException(nameof(types));
@@ -209,30 +198,15 @@ namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
         }
 
 
-        /// <summary>
-        /// 服务替换
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        public static IServiceCollection ReplaceServices(this IServiceCollection services)
-        {
-            //获取类型
-            var types = TypeFinder.GetAllTypes();
-
-            ReplaceServicesInternal(services, types);
-
-            return services;
-        }
-
 
         /// <summary>
         /// 注入拦截点 
         /// 注入拦截前之前先调用收集拦截点
         /// <see cref="InterceptExtensions.CollectionInterceptPoint"/>
         /// 或
-        /// <see cref="InterceptExtensions.CollectionInterceptPoint(List{Assembly})"/>
+        /// <see cref="InterceptExtensions.CollectionInterceptPoint(IEnumerable{Assembly})"/>
         /// 或
-        /// <see cref="InterceptExtensions.CollectionInterceptPoint(List{Type})"/>
+        /// <see cref="InterceptExtensions.CollectionInterceptPoint(IEnumerable{Type})"/>
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
@@ -281,6 +255,8 @@ namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
         /// <param name="types"></param>
         private static void ReplaceServicesInternal(IServiceCollection services,IEnumerable<Type> types) 
         {
+            types = types.Union(typeof(ServiceCollectionExtensions).Assembly.GetTypes());
+
             types=types.Where(t => t.IsClass && !t.IsAbstract);
 
             foreach (var type in types)

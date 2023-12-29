@@ -4,7 +4,6 @@ using OpenDeepSpace.Autofacastle.AspectAttention.Interceptor.Attributes;
 using OpenDeepSpace.Autofacastle.AspectAttention.InterceptorPoint;
 using OpenDeepSpace.Autofacastle.AspectAttention.InterceptorPoint.Attributes;
 using OpenDeepSpace.Autofacastle.DependencyInjection.Attributes;
-using OpenDeepSpace.Autofacastle.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +20,16 @@ namespace OpenDeepSpace.Autofacastle.Extensions
     {
 
         /// <summary>
+        /// 程序集
+        /// </summary>
+        internal static IEnumerable<Assembly> Assemblies { get; set; }
+
+        /// <summary>
+        /// 类型集合
+        /// </summary>
+        internal static IEnumerable<Type> Types { get; set; }
+
+        /// <summary>
         /// 筛选出拦截特性
         /// </summary>
         /// <param name="attributes"></param>
@@ -32,14 +41,30 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                     || t.GetType().BaseType == typeof(MethodAfterReturnAbstractInterceptAttribute) || t.GetType().BaseType == typeof(MethodAfterThrowingAbstractInterceptAttribute)
                     );
         }
-
         /// <summary>
         /// 收集拦截点
         /// </summary>
-        public static void CollectionInterceptPoint()
+        /// <param name="assemblies">程序集</param>
+        public static void CollectionInterceptPoint(IEnumerable<Assembly> assemblies)
         { 
+            if(assemblies == null)
+                throw new ArgumentNullException(nameof(assemblies));
+            CollectionInterceptPoint(assemblies.Where(t => !t.IsDynamic).SelectMany(t => t.GetTypes()));
+        }
+
+        /// <summary>
+        /// 收集拦截点
+        /// <paramref name="types"/>
+        /// </summary>
+        public static void CollectionInterceptPoint(IEnumerable<Type> types)
+        { 
+            if(types == null)
+                throw new ArgumentNullException($"{nameof(types)}");
+
+            types = types.Union(typeof(InterceptExtensions).Assembly.GetTypes());
+
             //获取所有类型
-            var types = TypeFinder.GetAllTypes().Where(t => t.IsClass && !t.IsAbstract);
+            types = types.Where(t => t.IsClass && !t.IsAbstract);
 
             //尝试拦截点添加
             types.Where(t => !t.Assembly.IsDynamic).ToList().ForEach(t =>
@@ -48,32 +73,22 @@ namespace OpenDeepSpace.Autofacastle.Extensions
             });
         }
 
-        /// <summary>
-        /// 收集拦截点
-        /// </summary>
-        /// <param name="assemblies">程序集</param>
-        public static void CollectionInterceptPoint(List<Assembly> assemblies)
-        { 
-            if(assemblies == null)
-                throw new ArgumentNullException(nameof(assemblies));
-            assemblies.Where(t => !t.IsDynamic).SelectMany(t => t.GetTypes()).Where(t => !t.IsAbstract && t.IsClass).ToList().ForEach(t =>
-            {
-                t.TryAddInterceptPoint();
-            });
-        }
 
         /// <summary>
-        /// 收集拦截点
+        /// 收集被拦截的类信息集合
+        /// 如果确认要拦截点拦截的话需要在收集拦截类信息之前先调用
+        /// <see cref="CollectionInterceptPoint"/>
+        /// 或
+        /// <see cref="CollectionInterceptPoint(IEnumerable{Assembly})"/>
+        /// 或
+        /// <see cref="CollectionInterceptPoint(IEnumerable{Type})"/>
         /// </summary>
-        /// <param name="types">类型集合</param>
-        public static void CollectionInterceptPoint(List<Type> types)
-        { 
-            if(types==null)
-                throw new ArgumentNullException(nameof(types));
-            types.Where(t => !t.IsAbstract && t.IsClass).ToList().ForEach(t =>
-            {
-                t.TryAddInterceptPoint();
-            });
+        public static void CollectionInterceptedTypeInfo(IEnumerable<Assembly> assemblies)
+        {
+            if(assemblies == null)
+                throw new ArgumentNullException(nameof(assemblies));
+
+            CollectionInterceptedTypeInfo(assemblies.SelectMany(t => t.GetTypes()));
         }
 
         /// <summary>
@@ -81,14 +96,17 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         /// 如果确认要拦截点拦截的话需要在收集拦截类信息之前先调用
         /// <see cref="CollectionInterceptPoint"/>
         /// 或
-        /// <see cref="CollectionInterceptPoint(List{Assembly})"/>
+        /// <see cref="CollectionInterceptPoint(IEnumerable{Assembly})"/>
         /// 或
-        /// <see cref="CollectionInterceptPoint(List{Type})"/>
+        /// <see cref="CollectionInterceptPoint(IEnumerable{Type})"/>
         /// </summary>
-        public static void CollectionInterceptedTypeInfo()
+        public static void CollectionInterceptedTypeInfo(IEnumerable<Type> types)
         {
+            if(types == null)
+                throw new ArgumentNullException(nameof(types));
+
             //获取所有类型
-            var types = TypeFinder.GetAllTypes().Where(t => t.IsClass && !t.IsAbstract);
+            types = types.Where(t => t.IsClass && !t.IsAbstract);
             CollectionInterceptedTypeInfoInternal(types);
         }
 
@@ -98,6 +116,8 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         /// <param name="types"></param>
         private static void CollectionInterceptedTypeInfoInternal(IEnumerable<Type> types)
         {
+            types = types.Union(typeof(InterceptExtensions).Assembly.GetTypes());
+
             foreach (var type in types)
             {
                 InterceptedTypeInfo interceptedTypeInfo = new InterceptedTypeInfo(type, type.IsAbstractIntercept(),

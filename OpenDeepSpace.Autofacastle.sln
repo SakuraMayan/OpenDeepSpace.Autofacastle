@@ -11,13 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenDeepSpace.Autofacastle"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autofacastle.Demo.ConsoleApp", "demo\Autofacastle.Demo.ConsoleApp\Autofacastle.Demo.ConsoleApp.csproj", "{8000C1B0-8DC3-42EB-B8E2-65B3E550CE28}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenDeepSpace.NetCore.Autofacastle", "src\OpenDeepSpace.NetCore.Autofacastle\OpenDeepSpace.NetCore.Autofacastle.csproj", "{16A15286-4025-49F1-829F-0B298F4CF92E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenDeepSpace.Demo.Api", "demo\OpenDeepSpace.Demo.Api\OpenDeepSpace.Demo.Api.csproj", "{A5370BDA-234C-4128-840A-BA41F704E522}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenDeepSpace.Demo.Services", "demo\OpenDeepSpace.Demo.Services\OpenDeepSpace.Demo.Services.csproj", "{E279EC63-E793-444C-96E2-B653B4A5251C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autofacastle.Demo.Services", "demo\Autofacastle.Demo.Services\Autofacastle.Demo.Services.csproj", "{8B8B8036-F726-4FA0-A274-61A558F3878C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autofacastle.Demo.Services", "demo\Autofacastle.Demo.Services\Autofacastle.Demo.Services.csproj", "{8B8B8036-F726-4FA0-A274-61A558F3878C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +31,6 @@ Global
 		{8000C1B0-8DC3-42EB-B8E2-65B3E550CE28}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8000C1B0-8DC3-42EB-B8E2-65B3E550CE28}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8000C1B0-8DC3-42EB-B8E2-65B3E550CE28}.Release|Any CPU.Build.0 = Release|Any CPU
-		{16A15286-4025-49F1-829F-0B298F4CF92E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{16A15286-4025-49F1-829F-0B298F4CF92E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{16A15286-4025-49F1-829F-0B298F4CF92E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{16A15286-4025-49F1-829F-0B298F4CF92E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A5370BDA-234C-4128-840A-BA41F704E522}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A5370BDA-234C-4128-840A-BA41F704E522}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5370BDA-234C-4128-840A-BA41F704E522}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -56,7 +50,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{699E36BE-62F5-4866-9593-577D3F9365E2} = {C477E263-48D6-44F5-A542-91E680B2081F}
 		{8000C1B0-8DC3-42EB-B8E2-65B3E550CE28} = {5D8CF361-2CBA-4BCE-B448-130F4D84FDB0}
-		{16A15286-4025-49F1-829F-0B298F4CF92E} = {C477E263-48D6-44F5-A542-91E680B2081F}
 		{A5370BDA-234C-4128-840A-BA41F704E522} = {5D8CF361-2CBA-4BCE-B448-130F4D84FDB0}
 		{E279EC63-E793-444C-96E2-B653B4A5251C} = {5D8CF361-2CBA-4BCE-B448-130F4D84FDB0}
 		{8B8B8036-F726-4FA0-A274-61A558F3878C} = {5D8CF361-2CBA-4BCE-B448-130F4D84FDB0}

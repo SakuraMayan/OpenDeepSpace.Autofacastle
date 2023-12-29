@@ -6,8 +6,8 @@ using OpenDeepSpace.Demo.Services.BasicInterfaceBatchInjection;
 using OpenDeepSpace.Autofacastle;
 using OpenDeepSpace.Autofacastle.DependencyInjection;
 using OpenDeepSpace.Autofacastle.Extensions;
-using OpenDeepSpace.Autofacastle.Reflection;
 using OpenDeepSpace.NetCore.Autofacastle.Extensions;
+using OpenDeepSpace.Demo.Api.Extensions;
 using System.Reflection;
 using Autofac.Extensions.DependencyInjection;
 
@@ -37,7 +37,7 @@ builder.Services.AddSwaggerGen();
 
 });*/
 
-builder.Host.UseAutofacastle();
+builder.Host.UseAutofacastle(new List<Assembly>() { typeof(Program).Assembly,typeof(ScopedServiceA).Assembly });
 builder.Host.ConfigureContainer<ContainerBuilder>(container =>
 {
 

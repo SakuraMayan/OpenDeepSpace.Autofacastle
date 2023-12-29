@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\OpenDeepSpace.Autofacastle\OpenDeepSpace.Autofacastle.csproj" />
     <ProjectReference Include="..\OpenDeepSpace.Demo.Services\OpenDeepSpace.Demo.Services.csproj" />
   </ItemGroup>
 

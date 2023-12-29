@@ -4,7 +4,6 @@ using Autofac.Core;
 using OpenDeepSpace.Autofacastle.AspectAttention.InterceptorPoint;
 using OpenDeepSpace.Autofacastle.DependencyInjection;
 using OpenDeepSpace.Autofacastle.DependencyInjection.Attributes;
-using OpenDeepSpace.Autofacastle.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +18,6 @@ namespace OpenDeepSpace.Autofacastle.Extensions
     /// </summary>
     public static class ContainerBuilderExtensions
     {
-        internal static bool IsConfigureIntercept=false;
 
         /// <summary>
         /// 批量注入
@@ -27,7 +25,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         /// <param name="containerBuilder"></param>
         /// <param name="assemblies">程序集</param>
         /// <returns></returns>
-        public static ContainerBuilder BatchInjection(this ContainerBuilder containerBuilder, List<Assembly> assemblies)
+        public static ContainerBuilder BatchInjection(this ContainerBuilder containerBuilder, IEnumerable<Assembly> assemblies)
         {
             if (assemblies == null)
                 throw new ArgumentNullException(nameof(assemblies));
@@ -35,7 +33,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
 
             var types = assemblies.SelectMany(t=>t.GetTypes());
 
-            BatchInjectionInternal(containerBuilder, types,IsConfigureIntercept);
+            BatchInjectionInternal(containerBuilder, types);
 
             return containerBuilder;
         }
@@ -46,34 +44,18 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         /// <param name="containerBuilder"></param>
         /// <param name="types">类型集合</param>
         /// <returns></returns>
-        public static ContainerBuilder BatchInjection(this ContainerBuilder containerBuilder, List<Type> types)
+        public static ContainerBuilder BatchInjection(this ContainerBuilder containerBuilder, IEnumerable<Type> types)
         {
 
             if (types == null)
                 throw new ArgumentNullException(nameof(types));
 
-            BatchInjectionInternal(containerBuilder, types,IsConfigureIntercept);
+            BatchInjectionInternal(containerBuilder, types);
 
             return containerBuilder;
         }
 
      
-        /// <summary>
-        /// ContainerBuilder批量注入
-        /// </summary>
-        /// <param name="containerBuilder"></param>
-        /// <returns></returns>
-        public static ContainerBuilder BatchInjection(this ContainerBuilder containerBuilder)
-        {
-            
-
-            //获取类型
-            var types = TypeFinder.GetAllTypes();
-            
-            BatchInjectionInternal(containerBuilder, types,IsConfigureIntercept);
-
-            return containerBuilder;
-        }
 
         /// <summary>
         /// 注入拦截点 
@@ -97,8 +79,11 @@ namespace OpenDeepSpace.Autofacastle.Extensions
             return containerBuilder;
         }
 
-        private static void BatchInjectionInternal(ContainerBuilder containerBuilder, IEnumerable<Type> types,bool IsConfigureIntercept=false)
+        private static void BatchInjectionInternal(ContainerBuilder containerBuilder, IEnumerable<Type> types)
         {
+            //内部自动加入
+            types = types = types.Union(typeof(ContainerBuilderExtensions).Assembly.GetTypes());
+
             //排序 暂时这样调整 实际上应该按照实现类 来进行分组排序的
             types = types.Where(t => t.IsClass && !t.IsAbstract).OrderBy(t => t is IImplementServiceOrder?(t as IImplementServiceOrder).ImplementServiceOrder : t.GetCustomAttribute<TransientAttribute>() != null ? (t.GetCustomAttribute<TransientAttribute>() as IImplementServiceOrder).ImplementServiceOrder :
             t.GetCustomAttribute<ScopedAttribute>() != null ? (t.GetCustomAttribute<ScopedAttribute>() as IImplementServiceOrder).ImplementServiceOrder
@@ -149,8 +134,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                                 }
                             }
                             //配置拦截
-                            if (IsConfigureIntercept)
-                                registrationBuilder.AddIntercept(type,false);
+                            registrationBuilder.AddIntercept(type,false);
                         }
 
 
@@ -183,8 +167,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                             }
                         }
                         //配置拦截
-                        if (IsConfigureIntercept)
-                            registrationBuilder.AddIntercept(type,false);
+                        registrationBuilder.AddIntercept(type,false);
                     }
 
                 }
@@ -228,8 +211,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                                 
                             }
                             //配置拦截
-                            if (IsConfigureIntercept)
-                                registrationBuilder.AddIntercept(type, false);
+                            registrationBuilder.AddIntercept(type, false);
                         }
 
 
@@ -262,8 +244,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                             }
                         }
                         //配置拦截
-                        if (IsConfigureIntercept)
-                            registrationBuilder.AddIntercept(type, false);
+                        registrationBuilder.AddIntercept(type, false);
                     }
                 }
 
@@ -305,8 +286,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                                 
                             }
                             //配置拦截
-                            if (IsConfigureIntercept)
-                                registrationBuilder.AddIntercept(type, false);
+                            registrationBuilder.AddIntercept(type, false);
                         }
 
 
@@ -345,8 +325,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                             
                         }
                         //配置拦截
-                        if (IsConfigureIntercept)
-                            registrationBuilder.AddIntercept(type, false);
+                        registrationBuilder.AddIntercept(type, false);
                     }
                 }
             }
