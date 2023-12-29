@@ -51,7 +51,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         /// <typeparam name="TService">服务类型</typeparam>
         /// <param name="services">服务集合</param>
         /// <returns></returns>
-        public static TService GetMinOrderService<TService>(this IEnumerable<TService> services) where TService : IImplementServiceOrder
+        public static TService GetMinOrderServiceImplementation<TService>(this IEnumerable<TService> services) where TService : IImplementServiceOrder
         {
 
             return services.OrderBy(t => t.ImplementServiceOrder).First();
@@ -64,7 +64,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         /// <typeparam name="TService">服务类型</typeparam>
         /// <param name="services">服务集合</param>
         /// <returns></returns>
-        public static TService GetMaxOrderService<TService>(this IEnumerable<TService> services) where TService : IImplementServiceOrder
+        public static TService GetMaxOrderServiceImplementation<TService>(this IEnumerable<TService> services) where TService : IImplementServiceOrder
         {
 
             return services.OrderByDescending(t => t.ImplementServiceOrder).First();
@@ -78,7 +78,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         /// <param name="services">服务集合</param>
         /// <param name="implementServiceOrder">实现服务的顺序号</param>
         /// <returns></returns>
-        public static TService GetAppointOrderService<TService>(this IEnumerable<TService> services, int implementServiceOrder) where TService : IImplementServiceOrder
+        public static TService GetAppointOrderServiceImplementation<TService>(this IEnumerable<TService> services, int implementServiceOrder) where TService : IImplementServiceOrder
         {
 
             return services.First(t => t.ImplementServiceOrder == implementServiceOrder);
