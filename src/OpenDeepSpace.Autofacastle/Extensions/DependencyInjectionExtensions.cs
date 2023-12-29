@@ -23,7 +23,7 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         public static Type[] FilterDependencyInjectionInterfaces(this Type[] types)
         {
 
-            types = types.Where(t => t != typeof(ITransient) && t != typeof(IScoped) && t != typeof(ISingleton) && t!=typeof(INonIntercept) && t!=typeof(IClassIntercept)).ToArray();
+            types = types.Where(t => t != typeof(ITransient) && t != typeof(IScoped) && t != typeof(ISingleton) && t!=typeof(INonIntercept) && t!=typeof(IClassIntercept) && t!=typeof(IImplementServiceOrder)).ToArray();
 
             return types;
         }
