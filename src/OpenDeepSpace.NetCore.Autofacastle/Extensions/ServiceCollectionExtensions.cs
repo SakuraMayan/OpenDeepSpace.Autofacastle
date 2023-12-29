@@ -71,11 +71,11 @@ namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
         private static void BatchInjectionInternal(IServiceCollection services, IEnumerable<Type> types)
         {
 
-            //排序
-            types = types.Where(t => t.IsClass && !t.IsAbstract).OrderBy(t => t.GetCustomAttribute<TransientAttribute>() != null ? (t.GetCustomAttribute<TransientAttribute>() as IDependencyInjection).ImplementServiceOrder :
-            t.GetCustomAttribute<ScopedAttribute>() != null ? (t.GetCustomAttribute<ScopedAttribute>() as IDependencyInjection).ImplementServiceOrder
-            : t.GetCustomAttribute<SingletonAttribute>() != null ? (t.GetCustomAttribute<SingletonAttribute>() as IDependencyInjection).ImplementServiceOrder
-            : 0) ;
+            //排序 暂时这样调整 实际上应该按照实现类 来进行分组排序的
+            types = types.Where(t => t.IsClass && !t.IsAbstract).OrderBy(t => t is IImplementServiceOrder ? (t as IImplementServiceOrder).ImplementServiceOrder : t.GetCustomAttribute<TransientAttribute>() != null ? (t.GetCustomAttribute<TransientAttribute>() as IImplementServiceOrder).ImplementServiceOrder :
+            t.GetCustomAttribute<ScopedAttribute>() != null ? (t.GetCustomAttribute<ScopedAttribute>() as IImplementServiceOrder).ImplementServiceOrder
+            : t.GetCustomAttribute<SingletonAttribute>() != null ? (t.GetCustomAttribute<SingletonAttribute>() as IImplementServiceOrder).ImplementServiceOrder
+            : 0);
 
             foreach (var type in types)
             {

@@ -9,7 +9,7 @@ namespace OpenDeepSpace.Autofacastle.DependencyInjection
     /// <summary>
     /// 
     /// </summary>
-    public interface IDependencyInjection
+    public interface IDependencyInjection:IImplementServiceOrder
     {
         /// <summary>
         /// 注册作为某类型的服务
