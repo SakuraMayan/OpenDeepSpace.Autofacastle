@@ -24,6 +24,14 @@ namespace OpenDeepSpace.Demo.Api.Controllers
 
         private readonly OrdinaryClassIntercept ordinaryClassIntercept;
 
+        //支持netcore原生的一个服务多实现采用IEnumerable的注入方式
+        private readonly IEnumerable<ITransientServiceB> transientServicesBs;
+
+        /*public AopLogController(IEnumerable<ITransientServiceB> transientServicesBs)
+        {
+            this.transientServicesBs = transientServicesBs;
+        }*/
+
         /// <summary>
         /// 
         /// </summary>
