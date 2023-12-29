@@ -11,7 +11,7 @@ namespace Autofacastle.Demo.ConsoleApp.Services
     /// <summary>
     /// TransientService服务
     /// </summary>
-    [Transient(Order =99999)]
+    [Transient(ImplementServiceOrder =99999)]
     public class TransientService : ITransientService/*, ITransient*/
     {
         /// <summary>

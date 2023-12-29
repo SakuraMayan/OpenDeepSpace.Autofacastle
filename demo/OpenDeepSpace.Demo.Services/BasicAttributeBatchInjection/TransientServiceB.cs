@@ -11,7 +11,7 @@ namespace OpenDeepSpace.Demo.Services.BasicAttributeBatchInjection
     /// <summary>
     /// 瞬时的TransientServiceA 每次产生一个新的实例
     /// </summary>
-    [Transient(Named ="TB",Order =1)]
+    [Transient(Named ="TB",ImplementServiceOrder =1)]
     public class TransientServiceB : ITransientServiceB
     {
         public Guid Id { get; set; } = Guid.NewGuid();

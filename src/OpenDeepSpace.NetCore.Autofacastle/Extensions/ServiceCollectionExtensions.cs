@@ -72,9 +72,9 @@ namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
         {
 
             //排序
-            types = types.Where(t => t.IsClass && !t.IsAbstract).OrderBy(t => t.GetCustomAttribute<TransientAttribute>() != null ? (t.GetCustomAttribute<TransientAttribute>() as IDependencyInjection).Order :
-            t.GetCustomAttribute<ScopedAttribute>() != null ? (t.GetCustomAttribute<ScopedAttribute>() as IDependencyInjection).Order
-            : t.GetCustomAttribute<SingletonAttribute>() != null ? (t.GetCustomAttribute<SingletonAttribute>() as IDependencyInjection).Order
+            types = types.Where(t => t.IsClass && !t.IsAbstract).OrderBy(t => t.GetCustomAttribute<TransientAttribute>() != null ? (t.GetCustomAttribute<TransientAttribute>() as IDependencyInjection).ImplementServiceOrder :
+            t.GetCustomAttribute<ScopedAttribute>() != null ? (t.GetCustomAttribute<ScopedAttribute>() as IDependencyInjection).ImplementServiceOrder
+            : t.GetCustomAttribute<SingletonAttribute>() != null ? (t.GetCustomAttribute<SingletonAttribute>() as IDependencyInjection).ImplementServiceOrder
             : 0) ;
 
             foreach (var type in types)
