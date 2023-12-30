@@ -23,7 +23,9 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         public static Type[] FilterDependencyInjectionInterfaces(this Type[] types)
         {
 
-            types = types.Where(t => t != typeof(ITransient) && t != typeof(IScoped) && t != typeof(ISingleton) && t!=typeof(INonIntercept) && t!=typeof(IClassIntercept) && t!=typeof(IImplementServiceOrder)).ToArray();
+            types = types.Where(t => t != typeof(ITransient) && t != typeof(IScoped) &&
+            t != typeof(ISingleton) && t!=typeof(INonIntercept) && t!=typeof(IClassIntercept) 
+            && t!=typeof(IImplementServiceOrder) && t != typeof(IServiceLifetime)).ToArray();
 
             return types;
         }
@@ -49,6 +51,23 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                     );
 
 
+        }
+
+        public static bool IsHasDependencyInjectionInterface(this Type type)
+        {
+            return type.GetInterfaces().Any(t => t == typeof(ITransient)
+                                      || t == typeof(IScoped)
+                                      || t == typeof(ISingleton)
+                                );
+        }
+
+        public static bool IsHasDependencyInjectionAttribute(this Type type)
+        {
+            return type.GetCustomAttributes().Select(t => t.GetType()).
+                                Any(t => t == typeof(TransientAttribute) ||
+                                       t == typeof(ScopedAttribute) ||
+                                       t == typeof(SingletonAttribute)
+                                    );
         }
 
         /// <summary>

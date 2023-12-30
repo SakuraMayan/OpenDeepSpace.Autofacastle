@@ -9,7 +9,7 @@ namespace OpenDeepSpace.Autofacastle.DependencyInjection
     /// <summary>
     /// 单例接口 实现了该接口当以单例周期注入
     /// </summary>
-    public interface ISingleton
+    public interface ISingleton:IServiceLifetime
     {
     }
 }

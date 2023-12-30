@@ -9,7 +9,7 @@ namespace OpenDeepSpace.Autofacastle.DependencyInjection
     /// <summary>
     /// 瞬时接口 实现了该接口将以瞬时周期进行注入
     /// </summary>
-    public interface ITransient
+    public interface ITransient:IServiceLifetime
     {
 
     }
