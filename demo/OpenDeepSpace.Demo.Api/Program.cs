@@ -6,7 +6,6 @@ using OpenDeepSpace.Demo.Services.BasicInterfaceBatchInjection;
 using OpenDeepSpace.Autofacastle;
 using OpenDeepSpace.Autofacastle.DependencyInjection;
 using OpenDeepSpace.Autofacastle.Extensions;
-using OpenDeepSpace.NetCore.Autofacastle.Extensions;
 using OpenDeepSpace.Demo.Api.Extensions;
 using System.Reflection;
 using Autofac.Extensions.DependencyInjection;

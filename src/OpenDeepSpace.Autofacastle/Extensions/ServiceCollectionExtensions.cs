@@ -14,7 +14,7 @@ using OpenDeepSpace.Autofacastle.Extensions;
 using OpenDeepSpace.Autofacastle;
 using Autofac.Extensions.DependencyInjection;
 
-namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
+namespace OpenDeepSpace.Autofacastle.Extensions
 {
     public static class ServiceCollectionExtensions
     {
@@ -25,175 +25,100 @@ namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
         /// <param name="services"></param>
         /// <param name="assemblies">程序集</param>
         /// <returns></returns>
-        public static IServiceCollection BatchInjection(this ServiceCollection services, IEnumerable<Assembly> assemblies)
+        public static IServiceCollection BatchInjection(this IServiceCollection services, IEnumerable<Assembly> assemblies)
         {
             if (assemblies == null)
                 throw new ArgumentNullException(nameof(assemblies));
 
-            var types = assemblies.SelectMany(t => t.GetTypes());
 
-            BatchInjectionInternal(services, types);
 
-            return services;
+            return BatchInjection(services, assemblies.SelectMany(t => t.GetTypes()));
+        }
+
+
+        /// <summary>
+        /// 批量注入
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="types"></param>
+        /// <returns></returns>
+        public static IServiceCollection BatchInjection(this IServiceCollection services, IEnumerable<Type> types)
+        {
+
+            return BatchInjectionInternal(services, types);
         }
 
         /// <summary>
         /// 批量注入
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="types">类型集合</param>
+        /// <param name="types"></param>
         /// <returns></returns>
-        public static IServiceCollection BatchInjection(this IServiceCollection services, IEnumerable<Type> types)
+        private static IServiceCollection BatchInjectionInternal(this IServiceCollection services, IEnumerable<Type> types)
         {
             if (types == null)
                 throw new ArgumentNullException(nameof(types));
 
-            BatchInjectionInternal(services, types);
+            
+            //加入自身的程序集
+            types =types.Union(typeof(ServiceCollectionExtensions).Assembly.GetTypes());
 
-            return services;
-        }
+            var result = types.CollectionBatchInjection();
 
+            Dictionary<Type, List<ImplementationDescription>> serviceDic = result.Item1;
+            Dictionary<Type, List<ImplementationDescription>> replaceServiceDic = result.Item2;
 
-      
-
-        private static void BatchInjectionInternal(IServiceCollection services, IEnumerable<Type> types)
-        {
-            types = types = types.Union(typeof(ServiceCollectionExtensions).Assembly.GetTypes());
-
-            //排序 暂时这样调整 实际上应该按照实现类 来进行分组排序的
-            types = types.Where(t => t.IsClass && !t.IsAbstract).OrderBy(t => t.GetCustomAttribute<TransientAttribute>() != null ? (t.GetCustomAttribute<TransientAttribute>() as IImplementServiceOrder).ImplementServiceOrder :
-            t.GetCustomAttribute<ScopedAttribute>() != null ? (t.GetCustomAttribute<ScopedAttribute>() as IImplementServiceOrder).ImplementServiceOrder
-            : t.GetCustomAttribute<SingletonAttribute>() != null ? (t.GetCustomAttribute<SingletonAttribute>() as IImplementServiceOrder).ImplementServiceOrder
-            : 0);
-
-            foreach (var type in types)
+            //实现向ServiceCollection中注入
+            foreach (var service in serviceDic.Keys)
             {
-                //瞬时
-                if (type.IsAssignableTo<ITransient>() || type.GetCustomAttribute<TransientAttribute>() != null)
-                {
-                    var transientAttr = type.GetCustomAttribute<TransientAttribute>();
-                    //如果指定了Keyed或Named尝试添加
-                    type.TryAddExistSameKeyedOrNamed(transientAttr);
 
-                    //注入自身
-                    services.AddTransient(type);
-                    if (transientAttr != null && transientAttr.AsServices != null && transientAttr.AsServices.Any())
-                    {//指定服务注入
-                        foreach (var service in transientAttr.AsServices)
-                        {
-                            //如果直接获取的出来Ixxx<> FullName为空 
-                            //针对泛型 FullName为空导致为非泛型 补充完整FullName 才能正确批量注入动态泛型
-                            //例如services.AddTransient(typeof(Ixxx<>),typeof(xxx()))
-                            var fixService = service.FixTypeReference();
-                            services.AddTransient(fixService, type);
-                        }
-                    }
-                    else
-                    {//未指定服务注入 查找实现的相关接口注入 
-                        foreach (var service in type.GetInterfaces().FilterDependencyInjectionInterfaces())
-                        {
-                            var fixService = service.FixTypeReference();
-                            services.AddTransient(fixService, type);
-                        }
-                    }
+                foreach (var implementation in serviceDic[service])
+                {
+                    //修复类型
+                    var fixService = service.FixTypeReference();
+                    var fixImplementation = implementation.ImplementationType.FixTypeReference();
+
+                    //存在注入自身的情况
+                    services.Add(new ServiceDescriptor(fixService, fixImplementation, implementation.ServiceLifetime));
+
 
                 }
 
-                //一次请求
-                if (type.IsAssignableTo<IScoped>() || type.GetCustomAttribute<ScopedAttribute>() != null)
+
+            }
+
+            //执行替换服务操作
+            foreach (var service in replaceServiceDic.Keys)
+            {
+                foreach (var implementation in replaceServiceDic[service])
                 {
-                    var scopedAttr = type.GetCustomAttribute<ScopedAttribute>();
-                    //如果指定了Keyed或Named尝试添加
-                    type.TryAddExistSameKeyedOrNamed(scopedAttr);
-                    //注入自身
-                    services.AddScoped(type);
+                    //修复类型
+                    var fixService = service.FixTypeReference();
+                    var fixImplementation = implementation.ImplementationType.FixTypeReference();
 
-                    if (scopedAttr != null && scopedAttr.AsServices != null && scopedAttr.AsServices.Any())
-                    {//指定服务注入
-                        foreach (var service in scopedAttr.AsServices)
-                        {
-                            var fixService = service.FixTypeReference();
-                            services.AddScoped(fixService, type);
-                        }
-                    }
-                    else
-                    {//未指定服务注入 查找实现的相关接口注入 
-                        foreach (var service in type.GetInterfaces().FilterDependencyInjectionInterfaces())
-                        {
-                            var fixService = service.FixTypeReference();
-                            services.AddScoped(fixService, type);
-                        }
-                    }
-
-                }
-
-                //单例
-                if (type.IsAssignableTo<ISingleton>() || type.GetCustomAttribute<SingletonAttribute>() != null)
-                {
-                    var singletonAttr = type.GetCustomAttribute<SingletonAttribute>();
-                    //如果指定了Keyed或Named尝试添加
-                    type.TryAddExistSameKeyedOrNamed(singletonAttr);
-                    //注入自身
-                    services.AddSingleton(type);
-
-                    if (singletonAttr != null && singletonAttr.AsServices != null && singletonAttr.AsServices.Any())
-                    {//指定服务注入
-                        foreach (var service in singletonAttr.AsServices)
-                        {
-                            var fixService = service.FixTypeReference();
-                            services.AddSingleton(fixService, type);
-                        }
-                        
-                    }
-                    else
-                    {//未指定服务注入 查找实现的相关接口注入 
-                        foreach (var service in type.GetInterfaces().FilterDependencyInjectionInterfaces())
-                        {
-                            var fixService = service.FixTypeReference();
-
-                            services.AddSingleton(fixService, type);
-                        }
-                    }
-
-                    //是否预加载 且不能是动态泛型
-                    if (singletonAttr!=null && singletonAttr.AutoActivate && !type.IsGenericTypeDefinition)
-                        AutofacastleCollection.AutoActives.Add(type);
+                    services.ReplaceService(fixService, fixImplementation, implementation.ServiceLifetime);
 
                 }
             }
-        }
-
-        /// <summary>
-        /// 替换服务
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="assemblies"></param>
-        /// <returns></returns>
-        public static IServiceCollection ReplaceServices(this IServiceCollection services, IEnumerable<Assembly> assemblies)
-        {
-            if (assemblies == null)
-                throw new ArgumentNullException(nameof(assemblies));
-
-            var types = assemblies.SelectMany(t => t.GetTypes());
-
-            services.ReplaceServices(types);
 
             return services;
         }
 
+        
+
+      
         /// <summary>
         /// 替换服务
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="types"></param>
+        /// <param name="serviceType"></param>
+        /// <param name="implementationType"></param>
+        /// <param name="lifetime"></param>
         /// <returns></returns>
-        public static IServiceCollection ReplaceServices(this IServiceCollection services, IEnumerable<Type> types)
+        public static IServiceCollection ReplaceService(this IServiceCollection services, Type serviceType, Type implementationType, ServiceLifetime lifetime)
         {
-            if (types == null)
-                throw new ArgumentNullException(nameof(types));
-
-            ReplaceServicesInternal(services, types);
-
+            ServiceDescriptor descriptor = new ServiceDescriptor(serviceType, implementationType, lifetime);
+            services.Replace(descriptor);
             return services;
         }
 
@@ -221,100 +146,6 @@ namespace OpenDeepSpace.NetCore.Autofacastle.Extensions
             return services;
         }
 
-        ///// <summary>
-        ///// 尝试注入被拦截的类型
-        ///// 使用该方法之前请先调用
-        ///// <see cref="InterceptExtensions.CollectionInterceptedTypeInfo"/>
-        ///// 或
-        ///// <see cref="InterceptExtensions.CollectionInterceptedTypeInfo(List{Assembly})"/>
-        ///// 或
-        ///// <see cref="InterceptExtensions.CollectionInterceptedTypeInfo(List{Type})"/>
-        ///// </summary>
-        ///// <param name="services"></param>
-        ///// <returns></returns>
-        //public static IServiceCollection TryInjectionInterceptedType(this IServiceCollection services)
-        //{
-
-        //    var serviceProvider = services.BuildServiceProvider();
-
-        //    foreach (var interceptedTypeInfo in AutofacastleCollection.InterceptedTypeInfos)
-        //    { 
-        //        var interceptedType = interceptedTypeInfo.InterceptedType;
-
-        //        //如果从容器中获取不到 都以Transient的方式注入
-        //        var selfInstance = serviceProvider.GetService(interceptedType);
-        //    }
-
-        //    return services;
-        //}
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="types"></param>
-        private static void ReplaceServicesInternal(IServiceCollection services,IEnumerable<Type> types) 
-        {
-            types = types.Union(typeof(ServiceCollectionExtensions).Assembly.GetTypes());
-
-            types=types.Where(t => t.IsClass && !t.IsAbstract);
-
-            foreach (var type in types)
-            {
-                var transientAttr = type.GetCustomAttribute<TransientAttribute>();
-                var scopedAttr = type.GetCustomAttribute<ScopedAttribute>();
-                var singletonAttr = type.GetCustomAttribute<SingletonAttribute>();
-
-                //瞬时 替换服务
-                if (transientAttr != null && transientAttr.ReplaceServices != null && transientAttr.ReplaceServices.Any())
-                {
-                    foreach (var replaceService in transientAttr.ReplaceServices)
-                    {
-
-                        services.ReplaceService(replaceService, type, ServiceLifetime.Transient);
-
-                    }
-                }
-
-                //一次请求 替换服务
-                if (scopedAttr != null && scopedAttr.ReplaceServices != null && scopedAttr.ReplaceServices.Any())
-                {
-                    foreach (var replaceService in scopedAttr.ReplaceServices)
-                    {
-                        services.ReplaceService(replaceService, type, ServiceLifetime.Scoped);
-
-                    }
-                }
-
-                //单例 替换服务
-                if (singletonAttr != null && singletonAttr.ReplaceServices != null && singletonAttr.ReplaceServices.Any())
-                {
-                    foreach (var replaceService in singletonAttr.ReplaceServices)
-                    {
-
-                        services.ReplaceService(replaceService, type, ServiceLifetime.Singleton);
-
-                    }
-                }
-
-
-            }
-        }
-
-
-        /// <summary>
-        /// 替换服务
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="serviceType"></param>
-        /// <param name="implementationType"></param>
-        /// <param name="lifetime"></param>
-        /// <returns></returns>
-        public static IServiceCollection ReplaceService(this IServiceCollection services,Type serviceType,Type implementationType, ServiceLifetime lifetime)
-        {
-            ServiceDescriptor descriptor = new ServiceDescriptor(serviceType, implementationType, lifetime);
-            services.Replace(descriptor);
-            return services;
-        }
+       
     }
 }

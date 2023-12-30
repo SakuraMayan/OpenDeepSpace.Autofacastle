@@ -10,7 +10,7 @@ namespace OpenDeepSpace.Autofacastle.DependencyInjection.Attributes
     /// 依赖注入特性
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public class DependencyInjectionAttribute : Attribute, IDependencyInjection,IKeyedNamed,IImplementServiceOrder
+    public class DependencyInjectionAttribute : Attribute, IAsServices,IReplaceServices,IKeyedNamed,IImplementServiceOrder
     {
         public Type[] AsServices { get ; set ; }
         public Type[] ReplaceServices { get ; set ; }

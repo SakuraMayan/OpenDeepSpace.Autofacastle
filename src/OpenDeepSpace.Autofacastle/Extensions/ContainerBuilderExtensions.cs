@@ -82,211 +82,52 @@ namespace OpenDeepSpace.Autofacastle.Extensions
         private static void BatchInjectionInternal(ContainerBuilder containerBuilder, IEnumerable<Type> types)
         {
             //内部自动加入
-            types = types = types.Union(typeof(ContainerBuilderExtensions).Assembly.GetTypes());
+            types = types.Union(typeof(ContainerBuilderExtensions).Assembly.GetTypes());
 
-            //排序 暂时这样调整 实际上应该按照实现类 来进行分组排序的
-            types = types.Where(t => t.IsClass && !t.IsAbstract).OrderBy(t => t.GetCustomAttribute<TransientAttribute>() != null ? (t.GetCustomAttribute<TransientAttribute>() as IImplementServiceOrder).ImplementServiceOrder :
-            t.GetCustomAttribute<ScopedAttribute>() != null ? (t.GetCustomAttribute<ScopedAttribute>() as IImplementServiceOrder).ImplementServiceOrder
-            : t.GetCustomAttribute<SingletonAttribute>() != null ? (t.GetCustomAttribute<SingletonAttribute>() as IImplementServiceOrder).ImplementServiceOrder
-            : 0);
+            //收集拦截点
+            var result = types.CollectionBatchInjection();
 
-            foreach (var type in types)
+            Dictionary<Type, List<ImplementationDescription>> serviceDic = result.Item1;
+
+
+            //实现向ContainerBuilder中注入
+            foreach (var service in serviceDic.Keys)
             {
-                //瞬时
-                if (type.IsAssignableTo<ITransient>() || type.GetCustomAttribute<TransientAttribute>() != null)
+
+                foreach (var implementation in serviceDic[service])
                 {
+                    //修复类型
+                    var fixService = service.FixTypeReference();
+                    var fixImplementation = implementation.ImplementationType.FixTypeReference();
 
-                    var transientAttr = type.GetCustomAttribute<TransientAttribute>();
-
-                    //如果指定了Keyed或Named尝试添加
-                    type.TryAddExistSameKeyedOrNamed(transientAttr);
 
                     //判断是否动态泛型
-                    if (type.IsGenericTypeDefinition)//动态泛型
+                    if (fixImplementation.IsGenericTypeDefinition)//动态泛型
                     {
-                        if (type.ContainsGenericParameters)//包含泛型参数 实现的为开放泛型才注入:xxx<> 实现的非开放泛型不能注入:xxx
+                        if (fixImplementation.ContainsGenericParameters)//包含泛型参数 实现的为开放泛型才注入:xxx<> 实现的非开放泛型不能注入:xxx
                         {
                             //注册自身
-                            var registrationBuilder = containerBuilder.RegisterGeneric(type).AsSelf();
-                            if (transientAttr != null && transientAttr.AsServices != null && transientAttr.AsServices.Any())
-                            {//指定服务注入
+                            var registrationBuilder = containerBuilder.RegisterGeneric(fixService).AsSelf();
+                            registrationBuilder = AsServiceForGenericType(fixImplementation, implementation.DependencyInjectionAttribute, registrationBuilder, fixService);
 
-                                foreach (var service in transientAttr.AsServices)
-                                {
-
-                                    registrationBuilder = AsServiceForGenericType(type, transientAttr, registrationBuilder, service);
-                                    //设置生命周期
-                                    registrationBuilder.InstancePerDependency();
-
-                                  
-                                }
-                                
-                            }
-                            else
-                            {//未指定服务注入 查找实现的相关接口注入 
-                                foreach (var service in type.GetInterfaces().FilterDependencyInjectionInterfaces())
-                                {
-                                    registrationBuilder = AsServiceForGenericType(type, transientAttr, registrationBuilder, service);
-                                    //设置生命周期
-                                    registrationBuilder.InstancePerDependency();
-
-                                   
-                                }
-                            }
-                            //配置拦截
-                            registrationBuilder.AddIntercept(type,false);
-                        }
-
-
-                    }
-                    else
-                    {
-                        //注册自身
-                        var registrationBuilder = containerBuilder.RegisterType(type).AsSelf();
-
-                        if (transientAttr != null && transientAttr.AsServices != null && transientAttr.AsServices.Any())
-                        {//指定服务注入
-                            foreach (var service in transientAttr.AsServices)
+                            switch (implementation.ServiceLifetime)
                             {
-                                registrationBuilder = AsService(type, transientAttr, registrationBuilder, service);
-
-                                //设置生命周期
-                                registrationBuilder.InstancePerDependency();
-
-                            }
-                            
-                        }
-                        else
-                        {//未指定服务注入 查找实现的相关接口注入 
-                            foreach (var service in type.GetInterfaces().FilterDependencyInjectionInterfaces())
-                            {
-                                registrationBuilder = AsService(type, transientAttr, registrationBuilder, service);
-                                //设置生命周期
-                                registrationBuilder.InstancePerDependency();
-
-                            }
-                        }
-                        //配置拦截
-                        registrationBuilder.AddIntercept(type,false);
-                    }
-
-                }
-
-                //一次请求
-                if (type.IsAssignableTo<IScoped>() || type.GetCustomAttribute<ScopedAttribute>() != null)
-                {
-                    var scopedAttr = type.GetCustomAttribute<ScopedAttribute>();
-                    //如果指定了Keyed或Named尝试添加
-                    type.TryAddExistSameKeyedOrNamed(scopedAttr);
-                    //判断是否动态泛型
-                    if (type.IsGenericTypeDefinition)//动态泛型
-                    {
-                        if (type.ContainsGenericParameters)//包含泛型参数 实现的为开放泛型才注入:xxx<> 实现的非开放泛型不能注入:xxx
-                        {
-                            //注册自身
-                            var registrationBuilder = containerBuilder.RegisterGeneric(type).AsSelf();
-                            if (scopedAttr != null && scopedAttr.AsServices != null && scopedAttr.AsServices.Any())
-                            {//指定服务注入
-                                foreach (var service in scopedAttr.AsServices)
-                                {
-                                    registrationBuilder = AsServiceForGenericType(type, scopedAttr, registrationBuilder, service);
-
-                                    //设置生命周期
-                                    registrationBuilder.InstancePerLifetimeScope();
-
-                                   
-                                }
-                               
-                            }
-                            else
-                            {//未指定服务注入 查找实现的相关接口注入 
-                                foreach (var service in type.GetInterfaces().FilterDependencyInjectionInterfaces())
-                                {
-                                    registrationBuilder = AsServiceForGenericType(type, scopedAttr, registrationBuilder, service);
-                                    //设置生命周期
-                                    registrationBuilder.InstancePerLifetimeScope();
-
-                                   
-                                }
-                                
-                            }
-                            //配置拦截
-                            registrationBuilder.AddIntercept(type, false);
-                        }
-
-
-                    }
-                    else
-                    {
-                        //注册自身
-                        var registrationBuilder = containerBuilder.RegisterType(type).AsSelf();
-
-                        if (scopedAttr != null && scopedAttr.AsServices != null && scopedAttr.AsServices.Any())
-                        {//指定服务注入
-                            foreach (var service in scopedAttr.AsServices)
-                            {
-                                registrationBuilder = AsService(type, scopedAttr, registrationBuilder, service);
-
-                                //设置生命周期
-                                registrationBuilder.InstancePerLifetimeScope();
-
-                            }
-                            
-                        }
-                        else
-                        {//未指定服务注入 查找实现的相关接口注入 
-                            foreach (var service in type.GetInterfaces().FilterDependencyInjectionInterfaces())
-                            {
-                                registrationBuilder = AsService(type, scopedAttr, registrationBuilder, service);
-                                //设置生命周期
-                                registrationBuilder.InstancePerLifetimeScope();
-
-                            }
-                        }
-                        //配置拦截
-                        registrationBuilder.AddIntercept(type, false);
-                    }
-                }
-
-                //单例
-                if (type.IsAssignableTo<ISingleton>() || type.GetCustomAttribute<SingletonAttribute>() != null)
-                {
-                    var singletonAttr = type.GetCustomAttribute<SingletonAttribute>();
-                    //如果指定了Keyed或Named尝试添加
-                    type.TryAddExistSameKeyedOrNamed(singletonAttr);
-                    //判断是否动态泛型
-                    if (type.IsGenericTypeDefinition)//动态泛型
-                    {
-                        if (type.ContainsGenericParameters)//包含泛型参数 实现的为开放泛型才注入:xxx<> 实现的非开放泛型不能注入:xxx
-                        {
-                            //注册自身
-                            var registrationBuilder = containerBuilder.RegisterGeneric(type).AsSelf();
-                            if (singletonAttr != null && singletonAttr.AsServices != null && singletonAttr.AsServices.Any())
-                            {//指定服务注入
-                                foreach (var service in singletonAttr.AsServices)
-                                {
-                                    registrationBuilder = AsServiceForGenericType(type, singletonAttr, registrationBuilder, service);
-
-                                    //设置生命周期
+                                case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton:
                                     registrationBuilder.SingleInstance();
-
-                                }
-                               
+                                    break;
+                                case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped:
+                                    registrationBuilder.InstancePerLifetimeScope();
+                                    break;
+                                case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient:
+                                    registrationBuilder.InstancePerDependency();
+                                    break;
+                                default:
+                                    break;
                             }
-                            else
-                            {//未指定服务注入 查找实现的相关接口注入 
-                                foreach (var service in type.GetInterfaces().FilterDependencyInjectionInterfaces())
-                                {
-                                    registrationBuilder = AsServiceForGenericType(type, singletonAttr, registrationBuilder, service);
-                                    //设置生命周期
-                                    registrationBuilder.SingleInstance();
-
-                                    
-                                }
-                                
-                            }
+                            
+                            
                             //配置拦截
-                            registrationBuilder.AddIntercept(type, false);
+                            registrationBuilder.AddIntercept(fixImplementation, false);
                         }
 
 
@@ -294,39 +135,31 @@ namespace OpenDeepSpace.Autofacastle.Extensions
                     else
                     {
                         //注册自身
-                        var registrationBuilder = containerBuilder.RegisterType(type).AsSelf();
+                        var registrationBuilder = containerBuilder.RegisterType(fixImplementation).AsSelf();
+                        registrationBuilder = AsService(fixImplementation, implementation.DependencyInjectionAttribute, registrationBuilder, fixService);
 
-                        if (singletonAttr != null && singletonAttr.AsServices != null && singletonAttr.AsServices.Any())
-                        {//指定服务注入
-                            foreach (var service in singletonAttr.AsServices)
-                            {
-                                registrationBuilder = AsService(type, singletonAttr, registrationBuilder, service);
-
-                                if (singletonAttr.AutoActivate)
-                                    registrationBuilder.AutoActivate();//预加载
-
-                                //设置生命周期
+                        //设置生命周期
+                        switch (implementation.ServiceLifetime)
+                        {
+                            case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton:
                                 registrationBuilder.SingleInstance();
-
-                            }
-                         
+                                if (implementation.AutoActivate)//预加载
+                                    registrationBuilder.AutoActivate();
+                                break;
+                            case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped:
+                                registrationBuilder.InstancePerLifetimeScope();
+                                break;
+                            case Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient:
+                                registrationBuilder.InstancePerDependency();
+                                break;
+                            default:
+                                break;
                         }
-                        else
-                        {//未指定服务注入 查找实现的相关接口注入 
-                            foreach (var service in type.GetInterfaces().FilterDependencyInjectionInterfaces())
-                            {
-                                registrationBuilder = AsService(type, singletonAttr, registrationBuilder, service);
-                                if (singletonAttr != null && singletonAttr.AutoActivate)
-                                    registrationBuilder.AutoActivate();//预加载
-                                //设置生命周期
-                                registrationBuilder.SingleInstance();
 
-                            }
-                            
-                        }
                         //配置拦截
-                        registrationBuilder.AddIntercept(type, false);
+                        registrationBuilder.AddIntercept(fixImplementation, false);
                     }
+
                 }
             }
         }

@@ -35,7 +35,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using OpenDeepSpace.Autofacastle;
 using OpenDeepSpace.Autofacastle.DependencyInjection.Attributes;
-using OpenDeepSpace.NetCore.Autofacastle.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Reflection;

@@ -4,7 +4,7 @@
 
 Copyright © 2023 by OpenDeepSpace. All rights reserved.
 Author: OpenDeepSpace	
-CreateTime: 2023/12/30 11:14:38	
+CreateTime: 2023/12/30 11:24:36	
 CLR: 4.0.30319.42000	
 Description:
 
@@ -29,8 +29,6 @@ Description:
 
 ===================================================================================================*/
 
-using Microsoft.Extensions.DependencyInjection;
-using OpenDeepSpace.Autofacastle.DependencyInjection.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -38,19 +36,16 @@ using System.Text;
 namespace OpenDeepSpace.Autofacastle.DependencyInjection
 {
     /// <summary>
-    /// 服务的实现
+    /// 
     /// </summary>
-    public class ImplementationDescription : IImplementServiceOrder,IAutoActivate
+    public interface IReplaceServices
     {
-
-        public ServiceLifetime ServiceLifetime { get; set; }
-        public Type ImplementationType { get; set; }
-        public int ImplementServiceOrder { get; set; }
-
-        public DependencyInjectionAttribute DependencyInjectionAttribute { get; set; }
-        public bool AutoActivate { get; set ; }
-
-        
-
+        /// <summary>
+        /// 替换服务
+        /// 比如 ServiceA 实现了 IServiceA
+        /// 现在有一个ServiceAUp 实现了 IServiceA 并且我们想用ServiceAUp的实现替换掉之前的ServiceA的实现
+        /// 这时候可以把ReplaceServices=new []{typeof(IServiceA)}接口
+        /// </summary>
+        Type[] ReplaceServices { get; set; }
     }
 }

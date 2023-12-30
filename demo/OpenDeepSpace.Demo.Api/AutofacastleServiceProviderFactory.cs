@@ -5,7 +5,6 @@ using OpenDeepSpace.Autofacastle;
 using OpenDeepSpace.Autofacastle.AspectAttention;
 using OpenDeepSpace.Autofacastle.DependencyInjection;
 using OpenDeepSpace.Autofacastle.Extensions;
-using OpenDeepSpace.NetCore.Autofacastle.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,7 +69,6 @@ namespace OpenDeepSpace.Demo.Api
             services.BatchInjection(types);
 
             //服务替换
-            services.ReplaceServices(types);
 
             //收集拦截点
             InterceptExtensions.CollectionInterceptPoint(types);
